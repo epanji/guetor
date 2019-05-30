@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8"/>
+        <title>Document</title>
+    </head>
+    <body>
+        <!-- Using navigation tag is acceptable too -->
+        <div id="nav" class="dummy">
+            <ul>
+                <li>Aa</li>
+                <li>Bb</li>
+                <li>Cc</li>
+            </ul>
+        </div>
+        <!-- Side contents, obviously not the target -->
+        <div id="side-contents" class="not-the-target">
+            <div class="side-content">
+                <b>Justo, nec?</b>
+                <i>Dictum fusce ut placerat orci nulla pellentesque?</i>
+            </div>
+            <div class="side-content">
+                <b>Eget arcu.</b>
+                <i>Consectetur lorem donec massa sapien, faucibus et.</i>
+            </div>
+        </div>
+        <!-- This is our target -->
+        <div id="contents-wrapper" class="fancy-page fancy-title">
+            <h1>Arcu, non sodales!</h1>
+            <p>Quam pellentesque nec nam aliquam sem et tortor
+                consequat id porta nibh venenatis cras sed felis eget
+                velit aliquet? Vulputate enim nulla aliquet porttitor
+                lacus, luctus accumsan tortor posuere ac?</p>
+            <p>Cursus euismod quis viverra nibh cras pulvinar mattis
+                nunc, sed blandit libero volutpat sed cras ornare arcu
+                dui vivamus arcu felis, bibendum ut tristique.</p>
+            <p>Ultricies leo integer malesuada nunc vel risus commodo
+                viverra maecenas accumsan, lacus vel facilisis
+                volutpat, est velit egestas dui, id ornare arcu.</p>
+        </div>
+        <!-- Exclude from target -->
+        <div id="comments" class="fancy-box">
+            <!-- Embeded from disqus or others -->
+        </div>
+    </body>
+</html>
