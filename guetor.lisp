@@ -5,7 +5,7 @@
   (:export #:*selector*
            #:*mode*
            #:document
-           #:available-selectors
+           #:available-elements
            #:element-selector
            #:selector))
 (in-package :guetor)
@@ -45,23 +45,25 @@
                                '%element-selector
                                (lquery-funcs:parents element)))
                    (otherwise (warn "Unknown mode.")))))
-    (format nil "~@[~{~A ~}~]~A" (reverse parents) current)))
+    (format nil "~@[~{~A ~}~]~A"
+            (reverse parents)
+            (or current *default-selector*))))
 
-(defun available-selectors (document)
-  (map 'list 'element-selector
+(defun available-elements (document)
+  (map 'list 'identity
        (lquery:$ document *default-tag-name* (parent))))
 
 (defun %selector (document)
   (when (plump-dom:root-p document)
-    (loop with all = (available-selectors document)
+    (loop with all = (available-elements document)
           and last = 0
           and result = nil
-          with no-dups = (remove-duplicates all :test 'equal)
+          with no-dups = (remove-duplicates all)
           for item in no-dups
-          for tmp = (count item all :test 'equal)
+          for tmp = (count item all)
           when (> tmp last)
             do (setf last tmp result item)
-          finally (return result))))
+          finally (return (element-selector result)))))
 
 (defun %perform-guess-p ()
   (or (null *selector*)
