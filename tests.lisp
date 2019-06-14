@@ -1,4 +1,4 @@
-;;;; guetor-tests.lisp
+;;;; guetor/tests.lisp
 
 (defpackage :guetor/tests
   (:use :cl :guetor :fiveam))
@@ -52,5 +52,5 @@
 
 (test (new-document-default-selector :depends-on new-document-custom-selector)
   ;; Return default because invalid html for input.
-  (with-fixture selector-mode (:simple)
+(with-fixture selector-mode (:simple)
     (is (string= "div" (selector "new input or document" t)))))
