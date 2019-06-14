@@ -2,7 +2,7 @@
 
 ### _Panji Kusuma <epanji@gmail.com>_
 
-Guetor is package to guess selector for contents wrapper.
+Guetor is system to guess selector for contents wrapper.
 
 ## Usage
 
