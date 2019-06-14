@@ -1,14 +1,16 @@
-;;;; guetor.lisp
+;;;; guetor/content.lisp
 
-(defpackage :guetor
+(defpackage :guetor/content
   (:use :cl)
+  (:import-from :lquery)
   (:export #:*selector*
            #:*mode*
            #:document
            #:available-elements
            #:element-selector
-           #:selector))
-(in-package :guetor)
+           #:selector
+           #:%perform-guess-p))
+(in-package :guetor/content)
 
 (defparameter *document* nil
   "Root DOM node for temporary document.")
