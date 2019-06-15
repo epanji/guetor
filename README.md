@@ -21,7 +21,7 @@ Guetor is system to guess selector for contents wrapper.
 ``` common-lisp
 CL-USER> (asdf:test-system "guetor")
 
-Running test suite GUETOR
+Running test suite CONTENT
  Running test NEW-DOCUMENT-SELECTOR .
  Running test NEW-DOCUMENT-LAST-SELECTOR ..
  Running test OLD-DOCUMENT-LAST-SELECTOR .
@@ -29,8 +29,19 @@ Running test suite GUETOR
  Running test NEW-DOCUMENT-CUSTOM-SELECTOR ..
  Running test NEW-DOCUMENT-FULL-MODE-SELECTOR ..
  Running test NEW-DOCUMENT-DEFAULT-SELECTOR .
- Did 11 checks.
-    Pass: 11 (100%)
+ Running test GUESS-SELECTOR-CONTENTS-WRAPPER .
+ Running test CUSTOM-SELECTOR-CONTENTS-WRAPPER ..
+ Running test ONLY-FIRST-GUESS-SELECTOR ...
+Running test suite CONTENT-MARKLESS
+ Running test CONTENTS-WRAPPER-TO-MARKLESS-STRING .
+ Running test OUTPUT-MARKLESS-FOR-FIRST-HEADER .
+ Running test OUTPUT-MARKLESS-FOR-SECOND-HEADER .
+ Running test OUTPUT-MARKLESS-FOR-THIRD-HEADER .
+ Running test OUTPUT-MARKLESS-FOR-FORTH-HEADER .
+ Running test OUTPUT-MARKLESS-FOR-FIFTH-HEADER .
+ Running test OUTPUT-MARKLESS-FOR-PARAGRAPH .
+ Did 24 checks.
+    Pass: 24 (100%)
     Skip: 0 ( 0%)
     Fail: 0 ( 0%)
 
