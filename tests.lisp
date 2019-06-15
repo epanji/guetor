@@ -12,8 +12,11 @@
   (let ((*mode* mode))
     (&body)))
 
-(def-suite :guetor)
-(in-suite :guetor)
+(def-suite :content)
+(def-suite :content-markless)
+(def-suite :markless-epub)
+
+(in-suite :content)
 
 (test new-document-selector
   ;; Force to guessing for new document.
@@ -54,3 +57,31 @@
   ;; Return default because invalid html for input.
 (with-fixture selector-mode (:simple)
     (is (string= "div" (selector "new input or document" t)))))
+
+(test guess-selector-contents-wrapper
+  ;; Force means perform guess selector.
+  (with-fixture selector-mode (:simple)
+    (is (string= *test-selector*
+                 (element-selector
+                  (contents-wrapper
+                   (merge-pathnames *test-file* *test-directory*)
+                   t))))))
+
+(test custom-selector-contents-wrapper
+  ;; Using custom selector, without guessing.
+  (with-fixture selector-mode (:simple)
+    (setf *selector* "div.side-content h3")
+    (is (string= "div.side-content h3" (selector)))
+    (is (string= "Quisque id!"
+                 (plump:text
+                  (contents-wrapper
+                   (merge-pathnames *test-file* *test-directory*)))))))
+
+(test only-first-guess-selector
+  ;; First guess selector, then use last selector for the rest.
+  (let ((file (merge-pathnames *test-file* *test-directory*)))
+    (setf *selector* nil)
+    (dotimes (i 3)
+      (if (= 0 i)
+          (is-true (nth-value 1 (contents-wrapper file)))
+          (is-false (nth-value 1 (contents-wrapper file)))))))
