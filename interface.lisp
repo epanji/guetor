@@ -8,4 +8,5 @@
            #:document
            #:available-elements
            #:element-selector
-           #:selector))
+           #:selector
+           #:contents-wrapper))
