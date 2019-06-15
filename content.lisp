@@ -9,7 +9,8 @@
            #:available-elements
            #:element-selector
            #:selector
-           #:%perform-guess-p))
+           #:%perform-guess-p
+           #:contents-wrapper))
 (in-package :guetor/content)
 
 (defparameter *document* nil
@@ -26,6 +27,9 @@
 
 (defparameter *mode* :simple
   "Mode for selector, :SIMPLE or :FULL.")
+
+(defparameter *content* nil
+  "Element node for contents wrapper.")
 
 (defun document (input)
   (unless (null input) (plump:parse input)))
@@ -46,7 +50,7 @@
                    (:full (map 'list
                                '%element-selector
                                (lquery-funcs:parents element)))
-                   (otherwise (warn "Unknown mode.")))))
+                   (otherwise (warn "Unknown mode: ~A" *mode*)))))
     (format nil "~@[~{~A ~}~]~A"
             (reverse parents)
             (or current *default-selector*))))
@@ -65,7 +69,8 @@
           for tmp = (count item all)
           when (> tmp last)
             do (setf last tmp result item)
-          finally (return (element-selector result)))))
+          finally (setf *content* result)
+                  (return (element-selector result)))))
 
 (defun %perform-guess-p ()
   (or (null *selector*)
@@ -79,3 +84,19 @@
            (progn (unless (eql *document* root) (setf *document* root))
                   (setf *selector* (or (%selector root) *default-selector*))))
           (t *selector*))))
+
+(defun contents-wrapper (document &optional force-p)
+  (let ((guess-p (or (%perform-guess-p) force-p))
+        (selector (selector document force-p))
+        (root (document document)))
+    (if guess-p
+        (values *content* guess-p)
+        (loop with elements = (lquery:$ root selector)
+              and size = -1             ; In case current = 0
+              and target = nil
+              for element across elements
+              for current = (length (lquery-funcs:children
+                                     element *default-tag-name*))
+              when (> current size)
+                do (setf size current target element)
+              finally (return (values target guess-p))))))
