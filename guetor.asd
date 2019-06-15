@@ -9,4 +9,4 @@
   :class :package-inferred-system
   :depends-on ("guetor/interface")
   :in-order-to ((test-op (load-op "guetor/tests")))
-  :perform (test-op (o c) (symbol-call :fiveam :run! :guetor)))
+  :perform (test-op (o c) (symbol-call :fiveam :run-all-tests)))
