@@ -85,3 +85,36 @@
       (if (= 0 i)
           (is-true (nth-value 1 (contents-wrapper file)))
           (is-false (nth-value 1 (contents-wrapper file)))))))
+
+(in-suite :content-markless)
+
+(test contents-wrapper-to-markless-string
+  (let ((node (contents-wrapper
+               (merge-pathnames *test-file* *test-directory*)
+               t)))
+    ;; Only check for header 1 on this test.
+    (is (string= "# " (subseq (output-markless node nil) 0 2)))))
+
+(test output-markless-for-first-header
+  (let ((node (plump:make-element (plump:make-root) "h1")))
+    (is (string= (format nil "# ~2&") (output-markless node nil)))))
+
+(test output-markless-for-second-header
+  (let ((node (plump:make-element (plump:make-root) "h2")))
+    (is (string= (format nil "## ~2&") (output-markless node nil)))))
+
+(test output-markless-for-third-header
+  (let ((node (plump:make-element (plump:make-root) "h3")))
+    (is (string= (format nil "### ~2&") (output-markless node nil)))))
+
+(test output-markless-for-forth-header
+  (let ((node (plump:make-element (plump:make-root) "h4")))
+    (is (string= (format nil "#### ~2&") (output-markless node nil)))))
+
+(test output-markless-for-fifth-header
+  (let ((node (plump:make-element (plump:make-root) "h5")))
+    (is (string= (format nil "##### ~2&") (output-markless node nil)))))
+
+(test output-markless-for-paragraph
+  (let ((node (plump:make-element (plump:make-root) "p")))
+    (is (string= (format nil "~3&") (output-markless node nil)))))
