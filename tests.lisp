@@ -113,8 +113,70 @@
 
 (test output-markless-for-fifth-header
   (let ((node (plump:make-element (plump:make-root) "h5")))
-    (is (string= (format nil "##### ~2&") (output-markless node nil)))))
+    (is (string= (format nil "##### ~%~2&") (output-markless node nil)))))
 
 (test output-markless-for-paragraph
   (let ((node (plump:make-element (plump:make-root) "p")))
-    (is (string= (format nil "~3&") (output-markless node nil)))))
+    (is (string= (format nil "~2&") (output-markless node nil)))))
+
+(test output-markless-for-blockquote
+  (let* ((html "<blockquote><p>it's</p><cite>me</cite></blockquote>")
+         (root (plump:parse html))
+         (node (aref (plump:children root) 0)))
+    (is (string= (format nil "| it's~&~~ me~&")
+                 (output-markless node nil)))))
+
+(test output-markless-for-cite
+  (let ((node (plump:make-element (plump:make-root) "cite")))
+    (is (string= (format nil "~~ ~&") (output-markless node nil)))))
+
+(test output-markless-for-li
+  (let ((node (plump:make-element (plump:make-root) "li")))
+    (is (string= (format nil "- ~&") (output-markless node nil)))))
+
+(test output-markless-for-image
+  (let ((node (plump:make-element (plump:make-root) "img")))
+    (is (string= (format nil "[ image  ]~&") (output-markless node nil)))))
+
+(test output-markless-for-audio
+  (let ((node (plump:make-element (plump:make-root) "audio")))
+    (is (string= (format nil "[ audio  ]~&") (output-markless node nil)))))
+
+(test output-markless-for-video
+  (let ((node (plump:make-element (plump:make-root) "video")))
+    (is (string= (format nil "[ video  ]~&") (output-markless node nil)))))
+
+(test output-markless-for-strong
+  (let ((node (plump:make-element (plump:make-root) "strong")))
+    (is (string= (format nil " **** ") (output-markless node nil)))))
+
+(test output-markless-for-b
+  (let ((node (plump:make-element (plump:make-root) "b")))
+    (is (string= (format nil " **** ") (output-markless node nil)))))
+
+(test output-markless-for-em
+  (let ((node (plump:make-element (plump:make-root) "em")))
+    (is (string= (format nil " //// ") (output-markless node nil)))))
+
+(test output-markless-for-i
+  (let ((node (plump:make-element (plump:make-root) "i")))
+    (is (string= (format nil " //// ") (output-markless node nil)))))
+
+(test output-markless-for-u
+  (let ((node (plump:make-element (plump:make-root) "u")))
+    (is (string= (format nil " ____ ") (output-markless node nil)))))
+
+(test output-markless-for-s
+  (let ((node (plump:make-element (plump:make-root) "s")))
+    (is (string= (format nil " <--> ") (output-markless node nil)))))
+
+(test output-markless-for-code
+  (let* ((html "<code data-language=\"common-lisp\"><pre>'(1)</pre></code>")
+         (root (plump:parse html))
+         (node (aref (plump:children root) 0)))
+    (is (string= (format nil ":: common-lisp~&'(1)~&::~2&")
+                 (output-markless node nil)))))
+
+(test output-markless-for-pre
+  (let ((node (plump:make-element (plump:make-root) "pre")))
+    (is (string= (format nil "~&") (output-markless node nil)))))
