@@ -1,14 +1,45 @@
-# GUETOR
+GUETOR: Guess Selector
+======================
 
-### _Panji Kusuma <epanji@gmail.com>_
+GUETOR is system to guess selector for contents wrapper in html.
+It provide utility to automatically guess or custom css selector for contents wrapper, then retrieve Plump DOM as the result. It could be converted to another format if desired.
 
-Guetor is system to guess selector for contents wrapper.
+The files that constitute GUETOR are:
 
-## Usage
+* [Interface](interface.lisp)
+  provide internal and external symbol for GUETOR system.
+
+* [Content](content.lisp)
+  provide automatic selector, custom selector and contents wrapper retriever.
+
+* [Content-markless](content-markless.lisp)
+  provide function to convert Plump DOM to markless format with lossy data.
+
+Related System:
+----------------
+
+* [lQuery](https://shinmera.github.io/lquery)
+* [Plump](https://shinmera.github.io/plump)
+* [CLSS](https://shinmera.github.io/CLSS)
+
+How to use?
+-----------
+
+Load system by quicklisp.
 
 ``` common-lisp
-(ql:quickload 'guetor)
+(ql:quickload "guetor")
+```
 
+Load system by ASDF.
+
+``` common-lisp
+(asdf:load-system "guetor")
+```
+
+Get css selector with options SIMPLE and FULL mode, default is SIMPLE.
+
+``` common-lisp
 (guetor:selector #p"test.html" t)
 => "div#contents-wrapper.fancy-page.fancy-title"
 
@@ -16,9 +47,33 @@ Guetor is system to guess selector for contents wrapper.
 => "html body div#contents-wrapper.fancy-page.fancy-title"
 ```
 
+Get contents wrapper with two values as results. First is Plump DOM and second is predicate for performing guess.
+
 ``` common-lisp
-CL-USER> (guetor:output-markless (guetor:contents-wrapper #p"test.html" t) nil)
-"# Arcu, non sodales!
+(guetor:contents-wrapper #p"test.html" t)
+=> #<PLUMP-DOM:ELEMENT div {10046FF773}>
+=> T
+```
+
+How to convert?
+---------------
+
+Convert to html by Plump.
+
+``` common-lisp
+(plump:serialize (guetor:contents-wrapper #p"test.html" t) nil)
+=> "<div id=\"contents-wrapper\" class=\"fancy-page fancy-title\">
+...
+...
+...
+        </div>"
+```
+
+Convert to markless by GUETOR with full text sample for review.
+
+``` common-lisp
+(guetor:output-markless (guetor:contents-wrapper #p"test.html" t) nil)
+=> "# Arcu, non sodales!
 
 Quam pellentesque nec nam aliquam sem et tortor consequat id porta nibh venenatis cras sed felis eget velit aliquet? Vulputate enim nulla aliquet porttitor lacus, luctus accumsan tortor posuere ac?
 
@@ -32,15 +87,32 @@ Ultricies leo integer malesuada nunc vel risus commodo viverra maecenas accumsan
 (+ 1 2 3 4)
 ::
 
-| Neque aliquam **vestibulum** morbi blandit cursus risus, at ultrices mi tempus imperdiet nulla malesuada pellentesque //elit// . Purus sit amet luctus venenatis, __lectus__ magna fringilla urna, porttitor rhoncus dolor <-purus-> non.
+**Posuere ac:**
+
+1. Felis eget nunc.
+2. Ac felis donec.
+3. Diam quis enim.
+
+| Neque aliquam **vestibulum** morbi blandit cursus risus, at ultrices mi tempus imperdiet nulla malesuada pellentesque //elit//. Purus sit amet luctus venenatis, __lectus__ magna fringilla urna, porttitor rhoncus dolor <-purus-> non.
 | - Amet nulla facilisi!
 | - Eget dolor morbi.
 | - Pretium quam vulputate.
 ~ Lorem
+
 "
 ```
 
-## Tests
+Author
+------
+
+Panji Kusuma (epanji@gmail.com)
+
+_Notes:_
+
+_Always remember when converting to markless, it will not be able to convert back with the same result as before. (lossy)_
+
+Tests
+-----
 
 ``` common-lisp
 CL-USER> (asdf:test-system "guetor")
@@ -66,20 +138,24 @@ Running test suite CONTENT-MARKLESS
  Running test OUTPUT-MARKLESS-FOR-PARAGRAPH .
  Running test OUTPUT-MARKLESS-FOR-BLOCKQUOTE .
  Running test OUTPUT-MARKLESS-FOR-CITE .
- Running test OUTPUT-MARKLESS-FOR-LI .
+ Running test OUTPUT-MARKLESS-FOR-LI ..
  Running test OUTPUT-MARKLESS-FOR-IMAGE .
  Running test OUTPUT-MARKLESS-FOR-AUDIO .
  Running test OUTPUT-MARKLESS-FOR-VIDEO .
- Running test OUTPUT-MARKLESS-FOR-STRONG .
- Running test OUTPUT-MARKLESS-FOR-B .
- Running test OUTPUT-MARKLESS-FOR-EM .
- Running test OUTPUT-MARKLESS-FOR-I .
- Running test OUTPUT-MARKLESS-FOR-U .
- Running test OUTPUT-MARKLESS-FOR-S .
+ Running test OUTPUT-MARKLESS-FOR-STRONG ..
+ Running test OUTPUT-MARKLESS-FOR-B ..
+ Running test OUTPUT-MARKLESS-FOR-EM ..
+ Running test OUTPUT-MARKLESS-FOR-I ..
+ Running test OUTPUT-MARKLESS-FOR-U ..
+ Running test OUTPUT-MARKLESS-FOR-S ..
  Running test OUTPUT-MARKLESS-FOR-CODE .
  Running test OUTPUT-MARKLESS-FOR-PRE .
- Did 38 checks.
-    Pass: 38 (100%)
+ Running test OUTPUT-MARKLESS-FOR-BR .
+ Running test OUTPUT-MARKLESS-FOR-A .
+ Did 47 checks.
+    Pass: 47 (100%)
     Skip: 0 ( 0%)
     Fail: 0 ( 0%)
+
+T
 ```
