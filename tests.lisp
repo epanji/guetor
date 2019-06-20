@@ -14,7 +14,6 @@
 
 (def-suite :content)
 (def-suite :content-markless)
-(def-suite :markless-epub)
 
 (in-suite :content)
 
@@ -55,7 +54,7 @@
 
 (test (new-document-default-selector :depends-on new-document-custom-selector)
   ;; Return default because invalid html for input.
-(with-fixture selector-mode (:simple)
+  (with-fixture selector-mode (:simple)
     (is (string= "div" (selector "new input or document" t)))))
 
 (test guess-selector-contents-wrapper
@@ -116,67 +115,117 @@
     (is (string= (format nil "##### ~%~2&") (output-markless node nil)))))
 
 (test output-markless-for-paragraph
-  (let ((node (plump:make-element (plump:make-root) "p")))
-    (is (string= (format nil "~2&") (output-markless node nil)))))
+  (let ((node (plump:parse "<p>paragraph</p>")))
+    (is (string= (format nil "paragraph~2&") (output-markless node nil)))))
 
 (test output-markless-for-blockquote
   (let* ((html "<blockquote><p>it's</p><cite>me</cite></blockquote>")
-         (root (plump:parse html))
-         (node (aref (plump:children root) 0)))
-    (is (string= (format nil "| it's~&~~ me~&")
+         (node (plump:parse html)))
+    (is (string= (format nil "| it's~&~~ me~2&")
                  (output-markless node nil)))))
 
 (test output-markless-for-cite
-  (let ((node (plump:make-element (plump:make-root) "cite")))
-    (is (string= (format nil "~~ ~&") (output-markless node nil)))))
+  (let ((node (plump:parse "<cite>name</cite>")))
+    (is (string= (format nil "~~ name~&") (output-markless node nil)))))
 
 (test output-markless-for-li
-  (let ((node (plump:make-element (plump:make-root) "li")))
-    (is (string= (format nil "- ~&") (output-markless node nil)))))
+  (let ((node-ul (plump:parse "<ul><li><p>a</p></li><li><p>b</p></li></ul>"))
+        (node-ol (plump:parse "<ol><li><p>a</p></li><li><p>b</p></li></ol>")))
+    (is (string= (format nil "- a~&- b~2&") (output-markless node-ul nil)))
+    (is (string= (format nil "1. a~&2. b~2&")
+                 (output-markless node-ol nil)))))
 
 (test output-markless-for-image
-  (let ((node (plump:make-element (plump:make-root) "img")))
-    (is (string= (format nil "[ image  ]~&") (output-markless node nil)))))
+  (let ((node (plump:parse "<img src=\"file.png\" />")))
+    (is (string= (format nil "[ image file.png ]~&")
+                 (output-markless node nil)))))
 
 (test output-markless-for-audio
-  (let ((node (plump:make-element (plump:make-root) "audio")))
-    (is (string= (format nil "[ audio  ]~&") (output-markless node nil)))))
+  (let ((node (plump:parse "<audio src=\"file.mp3\">skip</audio>")))
+    (is (string= (format nil "[ audio file.mp3 ]~&")
+                 (output-markless node nil)))))
 
 (test output-markless-for-video
-  (let ((node (plump:make-element (plump:make-root) "video")))
-    (is (string= (format nil "[ video  ]~&") (output-markless node nil)))))
+  (let ((node (plump:parse "<video src=\"file.mp4\">skip</video>")))
+    (is (string= (format nil "[ video file.mp4 ]~&")
+                 (output-markless node nil)))))
 
 (test output-markless-for-strong
-  (let ((node (plump:make-element (plump:make-root) "strong")))
-    (is (string= (format nil " **** ") (output-markless node nil)))))
+  (let ((node (plump:parse "<strong>bold</strong>"))
+        (node-for-spacer-test
+          (plump:parse
+           "<p>the <strong>text</strong> is <strong>bold</strong>!</p>")))
+    (is (string= (format nil "**bold**") (output-markless node nil)))
+    (is (string= (format nil "the **text** is **bold**!~2&")
+                 (output-markless node-for-spacer-test nil)))))
 
 (test output-markless-for-b
-  (let ((node (plump:make-element (plump:make-root) "b")))
-    (is (string= (format nil " **** ") (output-markless node nil)))))
+  (let ((node (plump:parse "<b>bold</b>"))
+        (node-for-spacer-test
+          (plump:parse
+           "<p>the <b>text</b> is <b>bold</b>!</p>")))
+    (is (string= (format nil "**bold**") (output-markless node nil)))
+    (is (string= (format nil "the **text** is **bold**!~2&")
+                 (output-markless node-for-spacer-test nil)))))
 
 (test output-markless-for-em
-  (let ((node (plump:make-element (plump:make-root) "em")))
-    (is (string= (format nil " //// ") (output-markless node nil)))))
+  (let ((node (plump:parse "<em>italic</em>"))
+        (node-for-spacer-test
+          (plump:parse
+           "<p>the <em>text</em> is <em>italic</em>!</p>")))
+    (is (string= (format nil "//italic//") (output-markless node nil)))
+    (is (string= (format nil "the //text// is //italic//!~2&")
+                 (output-markless node-for-spacer-test nil)))))
 
 (test output-markless-for-i
-  (let ((node (plump:make-element (plump:make-root) "i")))
-    (is (string= (format nil " //// ") (output-markless node nil)))))
+  (let ((node (plump:parse "<i>italic</i>"))
+        (node-for-spacer-test
+          (plump:parse
+           "<p>the <i>text</i> is <i>italic</i>!</p>")))
+    (is (string= (format nil "//italic//") (output-markless node nil)))
+    (is (string= (format nil "the //text// is //italic//!~2&")
+                 (output-markless node-for-spacer-test nil)))))
 
 (test output-markless-for-u
-  (let ((node (plump:make-element (plump:make-root) "u")))
-    (is (string= (format nil " ____ ") (output-markless node nil)))))
+  (let ((node (plump:parse "<u>underline</u>"))
+        (node-for-spacer-test
+          (plump:parse
+           "<p>the <u>text</u> is <u>underline</u>!</p>")))
+    (is (string= (format nil "__underline__") (output-markless node nil)))
+    (is (string= (format nil "the __text__ is __underline__!~2&")
+                 (output-markless node-for-spacer-test nil)))))
 
 (test output-markless-for-s
-  (let ((node (plump:make-element (plump:make-root) "s")))
-    (is (string= (format nil " <--> ") (output-markless node nil)))))
+  (let ((node (plump:parse "<s>strikethrough</s>"))
+        (node-for-spacer-test
+          (plump:parse
+           "<p>the <s>text</s> is <s>strikethrough</s>!</p>")))
+    (is (string= (format nil "<-strikethrough->") (output-markless node nil)))
+    (is (string= (format nil "the <-text-> is <-strikethrough->!~2&")
+                 (output-markless node-for-spacer-test nil)))))
 
 (test output-markless-for-code
-  (let* ((html "<code data-language=\"common-lisp\"><pre>'(1)</pre></code>")
-         (root (plump:parse html))
-         (node (aref (plump:children root) 0)))
-    (is (string= (format nil ":: common-lisp~&'(1)~&::~2&")
+  ;; Inline code not implemented.
+  (let ((node (plump:parse
+               (concatenate 'string
+                            "<code data-language=\"common-lisp\">"
+                            "<pre>'(+ 1 2)</pre>"
+                            "</code>"))))
+    (is (string= (format nil ":: common-lisp~&'(+ 1 2)~&::~2&")
                  (output-markless node nil)))))
 
 (test output-markless-for-pre
-  (let ((node (plump:make-element (plump:make-root) "pre")))
-    (is (string= (format nil "~&") (output-markless node nil)))))
+  (let ((node (plump:parse "<pre>(+ 1 2)</pre>")))
+    (is (string= (format nil "(+ 1 2)~&") (output-markless node nil)))))
+
+(test output-markless-for-br
+  ;; Tag br treated as spacer.
+  (let ((node (plump:parse "<p>one<br>two three</p>")))
+    (is (string= (format nil "one two three~2&")
+                 (output-markless node nil)))))
+
+(test output-markless-for-a
+  ;; Tag a treated as underline.
+  (let ((node (plump:parse "<p>the <a href=\"#id\">link</a> text</p")))
+    (is (string= (format nil "the __link__ text~2&")
+                 (output-markless node nil)))))
