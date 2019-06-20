@@ -1,147 +1,154 @@
 ;;;; guetor/content-markless.lisp
 
 (defpackage :guetor/content-markless
+  (:nicknames :guetor-c-m)
   (:use :cl)
   (:import-from :plump *stream*)
   (:export #:output-markless))
 (in-package :guetor/content-markless)
 
-(defparameter *open-tag*
-  '(("h1" . "# ")
-    ("h2" . "## ")
-    ("h3" . "### ")
-    ("h4" . "#### ")
-    ("h5" . "##### ")
-    ("p" . "")
-    ("cite" . "~~ ")
-    ("li" . "- ")
-    ("img" . "[ image ")
-    ("audio" . "[ audio ")
-    ("video" . "[ video ")
-    ("strong" . " **")
-    ("b" . " **")
-    ("em" . " //")
-    ("i" . " //")
-    ("u" . " __")
-    ("s" . " <-")
-    ("code" . ":: ")
-    ("pre" . "")
-    ;; inside-li
-    ("- p" . "")
-    ("- strong" . " **")
-    ("- b" . " **")
-    ("- em" . " //")
-    ("- i" . " //")
-    ("- u" . " __")
-    ("- s" . " <-")
-    ;; inside-blockquote
-    ("> h1" . "| # ")
-    ("> h2" . "| ## ")
-    ("> h3" . "| ### ")
-    ("> h4" . "| #### ")
-    ("> h5" . "| ##### ")
-    ("> p" . "| ")
-    ("> cite" . "~~ ")
-    ("> li" . "| - ")
-    ("> strong" . " **")
-    ("> b" . " **")
-    ("> em" . " //")
-    ("> i" . " //")
-    ("> u" . " __")
-    ("> s" . " <-")
-    ;; inside-blockquote-li
-    ("> - p" . "")
-    ("> - strong" . " **")
-    ("> - b" . " **")
-    ("> - em" . " //")
-    ("> - i" . " //")
-    ("> - u" . " __")
-    ("> - s" . " <-")))
+;;; Tag open and close rules:
+;;; - Forbid space or end of line on first character opening tag.
+;;; - May have end of line but not space on last character closing tag.
+;;; - Tag that affect multiple tags have to set line prefix.
+;;; - Line prefix can not affect tag with pure-p value T.
+(defparameter *collection-plist-tag*
+  '((:name "h1" :open "# " :close "~2&")
+    (:name "h2" :open "## " :close "~2&")
+    (:name "h3" :open "### " :close "~2&")
+    (:name "h4" :open "#### " :close "~2&")
+    (:name "h5" :open "##### " :close "~2&")
+    (:name "p" :open "" :close "~2&")
+    (:name "cite" :open "~~ " :close "~&" :pure-p t)
+    (:name "img" :open "[ image " :close " ]~&")
+    (:name "audio" :open "[ audio " :close " ]~&")
+    (:name "video" :open "[ video " :close " ]~&")
+    (:name "strong" :open "~/guetor-c-m::spacer/**" :close "**":pure-p t)
+    (:name "b" :open "~/guetor-c-m::spacer/**" :close "**" :pure-p t)
+    (:name "em" :open "~/guetor-c-m::spacer///" :close "//" :pure-p t)
+    (:name "i" :open "~/guetor-c-m::spacer///" :close "//" :pure-p t)
+    (:name "u" :open "~/guetor-c-m::spacer/__" :close "__" :pure-p t)
+    (:name "s" :open "~/guetor-c-m::spacer/<-" :close "->" :pure-p t)
+    (:name "code" :open ":: " :close "::~2&")
+    (:name "pre" :open "" :close "~&")
+    (:name "br" :open "~/guetor-c-m::spacer/" :pure-p t)
+    (:name "a" :open "~/guetor-c-m::spacer/__" :close "__" :pure-p t)
+    ;; Prefixed
+    (:name "blockquote" :prefix "| " :close "~2&")
+    (:name "ul" :prefix "- " :close "~2&")
+    (:name "ol" :prefix "~/guetor-c-m::counter/. " :close "~2&")))
 
-(defparameter *close-tag*
-  '(("h1" . "~2&")
-    ("h2" . "~2&")
-    ("h3" . "~2&")
-    ("h4" . "~2&")
-    ("h5" . "~2&")
-    ("p" . "~2&")
-    ("cite" . "~&")
-    ("li" . "~&")
-    ("img" . " ]~&")
-    ("audio" . " ]~&")
-    ("video" . " ]~&")
-    ("strong" . "** ")
-    ("b" . "** ")
-    ("em" . "// ")
-    ("i" . "// ")
-    ("u" . "__ ")
-    ("s" . "-> ")
-    ("code" . "::~2&")
-    ("pre" . "~&")
-    ;; inside-li
-    ("- p" . "~&")
-    ("- strong" . "** ")
-    ("- b" . "** ")
-    ("- em" . "// ")
-    ("- i" . "// ")
-    ("- u" . "__ ")
-    ("- s" . "-> ")
-    ;; inside-blockquote
-    ("> h1" . "~&")
-    ("> h2" . "~&")
-    ("> h3" . "~&")
-    ("> h4" . "~&")
-    ("> h5" . "~&")
-    ("> p" . "~&")
-    ("> cite" . "~&")
-    ("> li" . "~&")
-    ("> strong" . "** ")
-    ("> b" . "** ")
-    ("> em" . "// ")
-    ("> i" . "// ")
-    ("> u" . "__ ")
-    ("> s" . "-> ")
-    ;; inside-blockquote-li
-    ("> - p" . "~&")
-    ("> - strong" . "** ")
-    ("> - b" . "** ")
-    ("> - em" . "// ")
-    ("> - i" . "// ")
-    ("> - u" . "__ ")
-    ("> - s" . "-> ")))
+(defparameter *plist-attributes*
+  '(:src "~A" :data-language "~A~&"))
 
-(defparameter *important-attributes*
-  '("data-language" "src"))
+
 
-(defvar *inside-blockquote-p* nil)
+(defvar *tag-prefix* "")
+(defvar *counter* 0)
+(defvar *spacer* nil)
 
-(defun inside-blockquote-p (node)
-  (or (string= "blockquote" (plump:tag-name node))
-      *inside-blockquote-p*))
+(defun counter (stream int &optional colon at-sign)
+  (declare (ignore colon at-sign))
+  (princ int stream))
 
-(defvar *inside-li-p* nil)
+(defun spacer (stream arg &optional colon at-sign)
+  (declare (ignore arg colon at-sign))
+  (princ (if (or (null *spacer*)
+                 (zerop (length *spacer*))
+                 (string= *spacer* "~&")
+                 (string= *spacer* "~%"))
+             ;; Empty or Space
+             "" " ")
+         stream))
 
-(defun inside-li-p (node)
-  (or (string= "li" (plump:tag-name node))
-      *inside-li-p*))
+
 
-(defun translate-string (string tag-case)
-  (let ((tag (concatenate 'string
-                          (if *inside-blockquote-p* "> " "")
-                          (if *inside-li-p* "- ")
-                          string))
-        (place (case tag-case
-                 (:open *open-tag*)
-                 (:close *close-tag*)
-                 (otherwise nil))))
-    (format *stream* (or (rest (assoc tag place :test 'string=)) ""))))
+(defun remove-digit (string)
+  (remove-if 'digit-char-p string))
 
-(defun filter-attribute (key value)
-  (cond ((string= "src" key) (format nil "~A" value))
-        ((string= "data-language" key) (format nil "~A~&" value))
-        (t nil)))
+(defun indicator-value (plist &optional (indicator :name) (default ""))
+  (getf plist indicator default))
+
+(defun plist-tag (name)
+  (find name *collection-plist-tag* :test 'string= :key 'indicator-value))
+
+(defun plist-tag-value (name indicator &optional (default ""))
+  (let ((plist-tag (plist-tag name)))
+    (indicator-value plist-tag indicator default)))
+
+(defun final-tag-value (name indicator &optional (stream t))
+  (let ((tag-value (plist-tag-value name indicator nil))
+        (tag-prefix-p (plusp (length *tag-prefix*)))
+        (pure-p (plist-tag-value name :pure-p nil)))
+    (format stream (case indicator
+                     (:open (if (null tag-value) ""
+                                (concatenate 'string
+                                             (if pure-p
+                                                 ""
+                                                 *tag-prefix*)
+                                             tag-value)))
+                     (:close (update-spacer
+                              (funcall (if tag-prefix-p
+                                           'remove-digit
+                                           'identity)
+                                       (or tag-value ""))))
+                     (otherwise ""))
+            *counter*)))
+
+(defun final-text-value (string &optional (stream t))
+  (let ((before *spacer*))
+    (update-spacer string)
+    ;; Space after tag decorator.
+    (when (and (plusp (length string))
+               (or (string= before "**")
+                   (string= before "//")
+                   (string= before "__")
+                   (string= before "->")))
+      (unless (find (aref string 0) "?!.,:;")
+        (princ " " stream))))
+  (plump:encode-entities string stream))
+
+(defun attribute-format (name)
+  (indicator-value *plist-attributes*
+                   (intern (string-upcase name) :keyword)
+                   nil))
+
+
+
+(defun concatenate-tag-prefix (node)
+  (let ((string (plist-tag-value (plump:tag-name node) :prefix)))
+    (if (and (plusp (length string))
+             (string/= *tag-prefix* string))
+        (concatenate 'string *tag-prefix* string)
+        *tag-prefix*)))
+
+(defun update-counter (node)
+  (cond ((string= (plump:tag-name node) "ol") 0)
+        ((string= (plump:tag-name node) "li") (incf *counter*))
+        (t *counter*)))
+
+(defun update-spacer (string)
+  (let* ((no-digit (remove-digit string))
+         (length (length no-digit)))
+    (when (plusp length)
+      (setf *spacer* (subseq no-digit (max 0 (- length 2))))))
+  string)
+
+(defun traverse-children-p (node)
+  (and (plusp (length (plump:children node)))
+       (string/= (plump:tag-name node) "audio")
+       (string/= (plump:tag-name node) "video")
+       (string/= (plump:tag-name node) "title")))
+
+;;;
+;;; Reference from plump:serialize-object
+;;; --------------------------------------------
+;;; Why lossy? (:name element-lossy-markless)
+;;; Because there are lost data after converted.
+;;; --------------------------------------------
 
 (defun output-markless (node &optional (stream t))
+  (setf *spacer* "~&")
   (cond ((eql stream t)
          (let ((*stream* *standard-output*))
            (element-lossy-markless node)))
@@ -152,28 +159,19 @@
          (let ((*stream* stream))
            (element-lossy-markless node)))))
 
-;;;
-;;; Reference from plump:serialize-object
-;;; --------------------------------------------
-;;; Why lossy? (:ref element-lossy-markless)
-;;; Because there are loss data after converted.
-;;; --------------------------------------------
-
 (defmethod element-lossy-markless ((node plump:text-node))
-  (plump:encode-entities (plump:render-text node) *stream*))
+  (final-text-value (plump:render-text node) *stream*))
 (defmethod element-lossy-markless ((node plump:doctype)))
 (defmethod element-lossy-markless ((node plump:comment)))
 (defmethod element-lossy-markless ((node plump:element))
-  (translate-string (plump:tag-name node) :open)
+  (final-tag-value (plump:tag-name node) :open *stream*)
   (element-lossy-markless (plump:attributes node))
-  (when (and (< 0 (length (plump:children node)))
-             (string/= "audio" (plump:tag-name node))
-             (string/= "video" (plump:tag-name node)))
-    (loop with *inside-blockquote-p* = (inside-blockquote-p node)
-          and *inside-li-p* = (inside-li-p node)
+  (when (traverse-children-p node)
+    (loop with *tag-prefix* = (concatenate-tag-prefix node)
+          and *counter* = (update-counter node)
           for child across (plump:children node)
           do (element-lossy-markless child)))
-  (translate-string (plump:tag-name node) :close))
+  (final-tag-value (plump:tag-name node) :close *stream*))
 (defmethod element-lossy-markless ((node plump:fulltext-element)))
 (defmethod element-lossy-markless ((node plump:xml-header)))
 (defmethod element-lossy-markless ((node plump:cdata)))
@@ -182,10 +180,10 @@
   ;; Important for tags like code, img, audio, video.
   (let ((attributes (loop for key being the hash-keys of table
                           for val being the hash-values of table
-                          when (member key *important-attributes*
-                                       :test 'string=)
-                            collect (filter-attribute key val))))
-    (format *stream* "~@[~{~A~^ ~}~]" attributes)))
+                          for control = (attribute-format key)
+                          unless (null control)
+                            collect (format nil control val))))
+    (format *stream* "~@[~{~a~^ ~}~]" attributes)))
 (defmethod element-lossy-markless ((node plump:nesting-node))
   (loop for child across (plump:children node)
         do (element-lossy-markless child)))
