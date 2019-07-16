@@ -117,7 +117,7 @@
       (is (string= "title" it))
       (is-false p))))
 
-(test title-as-plum-dom-element
+(test title-as-plump-dom-element
   (let ((node (contents-wrapper
                 (merge-pathnames *test-file* *test-directory*)
                 t)))
