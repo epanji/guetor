@@ -1,8 +1,9 @@
 GUETOR: Guess Selector
 ======================
 
-GUETOR is system to guess selector for contents wrapper in html.
-It provide utility to automatically guess or custom css selector for contents wrapper, then retrieve Plump DOM as the result. It could be converted to another format if desired.
+GUETOR is system to guess selector for contents wrapper in HTML.
+It provide utility to automatically guess or manually set CSS selector for contents wrapper.
+It will retrieve Plump DOM as result that could be converted to desired format.
 
 The files that constitute GUETOR are:
 
@@ -12,8 +13,17 @@ The files that constitute GUETOR are:
 * [Content](content.lisp)
   provide automatic selector, custom selector and contents wrapper retriever.
 
+* [Title](title.lisp)
+  provide title retriever for contents.
+
+* [Output](output.lisp)
+  provide system to be inherited by others for lossy data convertion.
+
 * [Content-markless](content-markless.lisp)
-  provide function to convert Plump DOM to markless format with lossy data.
+  provide function to convert Plump DOM to markless format.
+
+* [Content-markdown](content-markdown.lisp)
+  provide work in progress function to convert Plump DOM to markdown format. (WIP)
 
 Related System:
 ----------------
@@ -55,6 +65,17 @@ Get contents wrapper with two values as results. First is Plump DOM and second i
 => T
 ```
 
+Get title with two values as results. First is the title and second is predicate for contents having title. In case no title inside contents, it will searching up until top document.
+
+``` common-lisp
+(guetor:title (guetor:contents-wrapper #p"test.html" t))
+=> #<PLUMP-DOM:ELEMENT h1 {1001FAF783}>
+=> T
+(guetor:title (guetor:contents-wrapper #p"test.html" t) :text)
+=> "Arcu, non sodales!"
+=> T
+```
+
 How to convert?
 ---------------
 
@@ -89,9 +110,11 @@ Ultricies leo integer malesuada nunc vel risus commodo viverra maecenas accumsan
 
 **Posuere ac:**
 
-1. Felis eget nunc.
-2. Ac felis donec.
-3. Diam quis enim.
+1. **Felis** eget nunc.
+2. Ac felis2. ``donec``.
+3. Diam3. ``quis`` enim.
+   - Tristique sollicitudin nibh.
+   - Diam sollicitudin tempor.
 
 | Neque aliquam **vestibulum** morbi blandit cursus risus, at ultrices mi tempus imperdiet nulla malesuada pellentesque //elit//. Purus sit amet luctus venenatis, __lectus__ magna fringilla urna, porttitor rhoncus dolor <-purus-> non.
 | - Amet nulla facilisi!
@@ -109,7 +132,7 @@ Panji Kusuma (epanji@gmail.com)
 
 _Notes:_
 
-_Always remember when converting to markless, it will not be able to convert back with the same result as before. (lossy)_
+_Always remember when converting to desired format, it will not be able to convert back with the same result as before. (lossy)_
 
 Tests
 -----
@@ -128,6 +151,32 @@ Running test suite CONTENT
  Running test GUESS-SELECTOR-CONTENTS-WRAPPER .
  Running test CUSTOM-SELECTOR-CONTENTS-WRAPPER ..
  Running test ONLY-FIRST-GUESS-SELECTOR ...
+ Did 17 checks.
+    Pass: 17 (100%)
+    Skip: 0 ( 0%)
+    Fail: 0 ( 0%)
+
+
+Running test suite TITLE
+ Running test TITLE-FROM-CONTENTS-WRAPPER ..
+ Running test TITLE-FROM-OUTSIDE-CONTENTS ..
+ Running test TITLE-AS-PLUM-DOM-ELEMENT .
+ Running test TITLE-AS-TEXT .
+ Running test TITLE-AS-VECTOR ..
+ Did 8 checks.
+    Pass: 8 (100%)
+    Skip: 0 ( 0%)
+    Fail: 0 ( 0%)
+
+
+Running test suite OUTPUT
+ Running test EXPORTED-SYMBOLS ......
+ Did 6 checks.
+    Pass: 6 (100%)
+    Skip: 0 ( 0%)
+    Fail: 0 ( 0%)
+
+
 Running test suite CONTENT-MARKLESS
  Running test CONTENTS-WRAPPER-TO-MARKLESS-STRING .
  Running test OUTPUT-MARKLESS-FOR-FIRST-HEADER .
@@ -138,7 +187,7 @@ Running test suite CONTENT-MARKLESS
  Running test OUTPUT-MARKLESS-FOR-PARAGRAPH .
  Running test OUTPUT-MARKLESS-FOR-BLOCKQUOTE .
  Running test OUTPUT-MARKLESS-FOR-CITE .
- Running test OUTPUT-MARKLESS-FOR-LI ..
+ Running test OUTPUT-MARKLESS-FOR-LI ...
  Running test OUTPUT-MARKLESS-FOR-IMAGE .
  Running test OUTPUT-MARKLESS-FOR-AUDIO .
  Running test OUTPUT-MARKLESS-FOR-VIDEO .
@@ -148,12 +197,12 @@ Running test suite CONTENT-MARKLESS
  Running test OUTPUT-MARKLESS-FOR-I ..
  Running test OUTPUT-MARKLESS-FOR-U ..
  Running test OUTPUT-MARKLESS-FOR-S ..
- Running test OUTPUT-MARKLESS-FOR-CODE .
+ Running test OUTPUT-MARKLESS-FOR-CODE ..
  Running test OUTPUT-MARKLESS-FOR-PRE .
  Running test OUTPUT-MARKLESS-FOR-BR .
  Running test OUTPUT-MARKLESS-FOR-A .
- Did 47 checks.
-    Pass: 47 (100%)
+ Did 32 checks.
+    Pass: 32 (100%)
     Skip: 0 ( 0%)
     Fail: 0 ( 0%)
 
