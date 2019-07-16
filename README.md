@@ -160,7 +160,7 @@ Running test suite CONTENT
 Running test suite TITLE
  Running test TITLE-FROM-CONTENTS-WRAPPER ..
  Running test TITLE-FROM-OUTSIDE-CONTENTS ..
- Running test TITLE-AS-PLUM-DOM-ELEMENT .
+ Running test TITLE-AS-PLUMP-DOM-ELEMENT .
  Running test TITLE-AS-TEXT .
  Running test TITLE-AS-VECTOR ..
  Did 8 checks.
