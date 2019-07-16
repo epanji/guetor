@@ -1,16 +1,27 @@
 ;;;; guetor/content.lisp
 
 (defpackage :guetor/content
+  (:nicknames :guetor-c)
   (:use :cl)
   (:import-from :lquery)
-  (:export #:*selector*
-           #:*mode*
-           #:document
-           #:available-elements
-           #:element-selector
-           #:selector
-           #:%perform-guess-p
-           #:contents-wrapper))
+  (:export
+   ;; ---------------------
+   #:*mode*
+   #:*selector*
+   #:*content*
+   #:*document*
+   #:*default-selector*
+   #:*default-tag-name*
+   ;; ---------------------
+   #:document
+   #:available-elements
+   #:element-selector
+   #:selector
+   #:contents-wrapper
+   ;; ---------------------
+   #:%selector
+   #:%perform-guess-p
+   #:%element-selector))
 (in-package :guetor/content)
 
 (defparameter *document* nil
@@ -32,7 +43,9 @@
   "Element node for contents wrapper.")
 
 (defun document (input)
-  (unless (null input) (plump:parse input)))
+  (cond ((null input) nil)
+        ((plump:root-p input) input)
+        (t (plump:parse input))))
 
 (defun %element-selector (element)
   (when (typep element 'plump-dom:element)
