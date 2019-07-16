@@ -1,7 +1,8 @@
 ;;;; guetor/tests.lisp
 
 (defpackage :guetor/tests
-  (:use :cl :guetor :fiveam))
+  (:use :cl :guetor :fiveam)
+  (:export #:suite-tests))
 (in-package :guetor/tests)
 
 (defparameter *test-file* "test.html")
@@ -13,7 +14,15 @@
     (&body)))
 
 (def-suite :content)
+(def-suite :title)
+(def-suite :output)
 (def-suite :content-markless)
+
+(defun suite-tests ()
+  (run! :content)
+  (run! :title)
+  (run! :output)
+  (run! :content-markless))
 
 (in-suite :content)
 
@@ -85,6 +94,76 @@
           (is-true (nth-value 1 (contents-wrapper file)))
           (is-false (nth-value 1 (contents-wrapper file)))))))
 
+(in-suite :title)
+
+(test title-from-contents-wrapper
+  (let ((node (contents-wrapper
+               (merge-pathnames *test-file* *test-directory*)
+               t)))
+    (multiple-value-bind (it p) (title node)
+      (is-false (null it))
+      (is-true p))))
+
+(test title-from-outside-contents
+  (let* ((string (concatenate 'string
+                              "<body><div class= \"something\" ><p>about</p>"
+                              "</div><div><div><h1>title</h1></div></div>"
+                              "<div class= \"adds\" ><p>product</p></div>"
+                              "<div class= \"contents\" ><p>a</p><p>b</p>"
+                              "<p>c</p></div></body>"))
+         (node (plump:parse string))
+         (contents (contents-wrapper node t)))
+    (multiple-value-bind (it p) (title contents :text)
+      (is (string= "title" it))
+      (is-false p))))
+
+(test title-as-plum-dom-element
+  (let ((node (contents-wrapper
+                (merge-pathnames *test-file* *test-directory*)
+                t)))
+    (is (typep (title node :element) 'plump-dom:element))))
+
+(test title-as-text
+  (let ((node (contents-wrapper
+                (merge-pathnames *test-file* *test-directory*)
+                t)))
+    (is (typep (title node :text) 'string))))
+
+(test title-as-vector
+  (let ((node (contents-wrapper
+                (merge-pathnames *test-file* *test-directory*)
+                t)))
+    (is (typep (title node :element-vector) 'vector))
+    (is (typep (title node :text-vector) 'vector))))
+
+(in-suite :output)
+
+(test exported-symbols
+  (is (eql :EXTERNAL
+           (nth-value 1 (find-symbol
+                         "*COLLECTION-PLIST-TAG*"
+                         :guetor/output))))
+  (is (eql :EXTERNAL
+           (nth-value 1 (find-symbol
+                         "*PLIST-ATTRIBUTE*"
+                         :guetor/output))))
+  (is (eql :EXTERNAL
+           (nth-value 1 (find-symbol
+                         "*RECORD-PARENTS*"
+                         :guetor/output))))
+  (is (eql :EXTERNAL
+           (nth-value 1 (find-symbol
+                         "*RECORD-NUMBER*"
+                         :guetor/output))))
+  (is (eql :EXTERNAL
+           (nth-value 1 (find-symbol
+                         "*RECORD-STRING*"
+                         :guetor/output))))
+  (is (eql :EXTERNAL
+           (nth-value 1 (find-symbol
+                         "DEFINE-OUTPUT"
+                         :guetor/output)))))
+
 (in-suite :content-markless)
 
 (test contents-wrapper-to-markless-string
@@ -129,11 +208,16 @@
     (is (string= (format nil "~~ name~&") (output-markless node nil)))))
 
 (test output-markless-for-li
+  ;; Nested
   (let ((node-ul (plump:parse "<ul><li><p>a</p></li><li><p>b</p></li></ul>"))
-        (node-ol (plump:parse "<ol><li><p>a</p></li><li><p>b</p></li></ol>")))
+        (node-ol (plump:parse "<ol><li><p>a</p></li><li><p>b</p></li></ol>"))
+        (node-nested (plump:parse "<ol><li><p>a</p></li><li><p>b</p><ul>
+<li><p>ba</p></li><li><p>bb</p></li></ul></li></ol>")))
     (is (string= (format nil "- a~&- b~2&") (output-markless node-ul nil)))
     (is (string= (format nil "1. a~&2. b~2&")
-                 (output-markless node-ol nil)))))
+                 (output-markless node-ol nil)))
+    (is (string= (format nil "1. a~&2. b~&   - ba~&   - bb~2&")
+                 (output-markless node-nested nil)))))
 
 (test output-markless-for-image
   (let ((node (plump:parse "<img src=\"file.png\" />")))
@@ -205,14 +289,17 @@
                  (output-markless node-for-spacer-test nil)))))
 
 (test output-markless-for-code
-  ;; Inline code not implemented.
   (let ((node (plump:parse
                (concatenate 'string
                             "<code data-language=\"common-lisp\">"
                             "<pre>'(+ 1 2)</pre>"
-                            "</code>"))))
+                            "</code>")))
+        (node-inline
+          (plump:parse "<p>Nibh <code>tortor</code> id aliquet!</p>")))
     (is (string= (format nil ":: common-lisp~&'(+ 1 2)~&::~2&")
-                 (output-markless node nil)))))
+                 (output-markless node nil)))
+    (is (string= (format nil "Nibh ``tortor`` id aliquet!~2&")
+                 (output-markless node-inline nil)))))
 
 (test output-markless-for-pre
   (let ((node (plump:parse "<pre>(+ 1 2)</pre>")))
