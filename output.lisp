@@ -38,6 +38,7 @@
 ;;; - Line prefix may become indent except tag with absolute-prefix-p value T.
 ;;; - Tag with style-tag-p value T will be check agains punctuations.
 ;;; - Tag may have indicator predicate for skip-children-p.
+;;; - Avoid trim with raw-children-text-p value T.
 ;;; - Undefine indicator means the value NIL or Empty.
 ;;; - Tag with different output may have alt-open and alt-close.
 ;;; - All indicator predicate does not apply for alternative.
@@ -53,6 +54,7 @@
 ;;; - :pure-tag-p NIL
 ;;; - :style-tag-p NIL
 ;;; - :skip-children-p NIL
+;;; - :raw-children-text-p NIL
 (defvar *collection-plist-tag* nil)
 
 ;;; Format control for attribute value
@@ -170,6 +172,11 @@
 
 ;;; Finalizer
 ;;;
+(defparameter *raw-children-text-p* nil)
+
+(defun raw-children-text-p (node)
+  (plist-tag-value (plump:tag-name node) :raw-children-text-p nil))
+
 (defun final-tag-value (name indicator &optional (stream t))
   (let ((tag-value (plist-tag-value name indicator nil))
         (tag-prefix-p (plusp (length *record-parents*)))
@@ -233,7 +240,10 @@
                 (element-lossy-output node)))))))
 
 (defmethod element-lossy-output ((node plump:text-node))
-  (final-text-value (plump:render-text node) *stream*))
+  (final-text-value (if *raw-children-text-p*
+                        (plump:text node)
+                        (plump:render-text node))
+                    *stream*))
 (defmethod element-lossy-output ((node plump:doctype)))
 (defmethod element-lossy-output ((node plump:comment)))
 (defmethod element-lossy-output ((node plump:element))
@@ -242,6 +252,7 @@
   (unless (skip-children-p node)
     (loop with *record-parents* = (update-prefixer node)
           and *record-number* = (update-counter node)
+          and *raw-children-text-p* = (raw-children-text-p node)
           for child across (plump:children node)
           do (element-lossy-output child)))
   (final-tag-value (plump:tag-name node) :close *stream*))
