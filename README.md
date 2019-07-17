@@ -14,7 +14,7 @@ The files that constitute GUETOR are:
   provide automatic selector, custom selector and contents wrapper retriever.
 
 * [Title](title.lisp)
-  provide title retriever for contents.
+  provide title retriever for contents wrapper.
 
 * [Output](output.lisp)
   provide system to be inherited by others for lossy data convertion.
@@ -47,7 +47,7 @@ Load system by ASDF.
 (asdf:load-system "guetor")
 ```
 
-Get css selector with options SIMPLE and FULL mode, default is SIMPLE.
+Get CSS selector with options SIMPLE and FULL mode, default is SIMPLE.
 
 ``` common-lisp
 (guetor:selector #p"test.html" t)
@@ -111,8 +111,8 @@ Ultricies leo integer malesuada nunc vel risus commodo viverra maecenas accumsan
 **Posuere ac:**
 
 1. **Felis** eget nunc.
-2. Ac felis2. ``donec``.
-3. Diam3. ``quis`` enim.
+2. Ac felis ``donec``.
+3. Diam ``quis`` enim.
    - Tristique sollicitudin nibh.
    - Diam sollicitudin tempor.
 
