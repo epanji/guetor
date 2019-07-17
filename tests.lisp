@@ -292,11 +292,14 @@
   (let ((node (plump:parse
                (concatenate 'string
                             "<code data-language=\"common-lisp\">"
-                            "<pre>'(+ 1 2)</pre>"
+                            "<pre>(+ 1 2)"
+                            (string #\Newline)
+                            "(+ 1 2 3)"
+                            "</pre>"
                             "</code>")))
         (node-inline
           (plump:parse "<p>Nibh <code>tortor</code> id aliquet!</p>")))
-    (is (string= (format nil ":: common-lisp~&'(+ 1 2)~&::~2&")
+    (is (string= (format nil ":: common-lisp~&(+ 1 2)~&(+ 1 2 3)~&::~2&")
                  (output-markless node nil)))
     (is (string= (format nil "Nibh ``tortor`` id aliquet!~2&")
                  (output-markless node-inline nil)))))
