@@ -86,6 +86,9 @@
 (defun remove-digit (string)
   (remove-if 'digit-char-p string))
 
+(defun tail-string (string &optional (max 2))
+  (subseq string (max 0 (- (length string) max))))
+
 (defun concatenate-keyword (&rest inputs)
   (intern (string-upcase
            (apply 'concatenate 'string
@@ -134,7 +137,7 @@
   (let* ((no-digit (remove-digit string))
          (length (length no-digit)))
     (when (plusp length)
-      (setf *record-string* (subseq no-digit (max 0 (- length 2))))))
+      (setf *record-string* (tail-string no-digit))))
   string)
 
 ;;; Prefixer
@@ -209,7 +212,8 @@
   (let ((before *record-string*))
     (update-spacer string)
     (when (and (plusp (length string))
-               (member before (indicator-values :close :style-tag-p)
+               (member before (mapcar 'tail-string
+                                      (indicator-values :close :style-tag-p))
                        :test 'string=))
       (unless (find (aref string 0) "?!.,:;")
         (princ +space-string+ stream))))
@@ -267,7 +271,7 @@
                           for control = (attribute-format key)
                           unless (null control)
                             collect (format nil control val))))
-    (format *stream* "~@[~{~a~^ ~}~]" attributes)))
+    (format *stream* "~@[~{~A~^ ~}~]" attributes)))
 (defmethod element-lossy-output ((node plump:nesting-node))
   (loop for child across (plump:children node)
         do (element-lossy-output child)))
