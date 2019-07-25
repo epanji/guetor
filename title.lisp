@@ -48,7 +48,7 @@ This function will return the TITLE and PREDICATE for node having title.
   (:documentation "Guess title from PLUMP-DOM:ELEMENT contents."))
 
 (defmethod guess-title ((node plump-dom:root) key)
-  (guess-title (find-header node)))
+  (guess-title (find-header node) key))
 
 (defmethod guess-title ((node plump-dom:element) key)
   (guess-title (find-header node 'plump:parent) key))
