@@ -1,6 +1,7 @@
 ;;;; guetor/content-markless.lisp
 
 (defpackage :guetor/content-markless
+  (:nicknames :guetor-c-less)
   (:use :cl)
   (:import-from :plump #:*stream*)
   (:import-from :guetor/output
