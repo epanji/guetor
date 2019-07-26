@@ -1,6 +1,7 @@
 ;;;; guetor/title.lisp
 
 (defpackage :guetor/title
+  (:nicknames :guetor-t)
   (:use :cl)
   (:import-from :lquery)
   (:export #:*header-selector*
