@@ -217,7 +217,7 @@
                        :test 'string=))
       (unless (find (aref string 0) "?!.,:;")
         (princ +space-string+ stream))))
-  (plump:encode-entities string stream))
+  (princ string stream))
 
 ;;;
 ;;; Reference from plump:serialize-object
