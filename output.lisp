@@ -219,6 +219,32 @@
         (princ +space-string+ stream))))
   (princ string stream))
 
+;;; Repeater
+;;;
+(defvar *repeat-number* 0)
+
+(defun repeater (node indicator &optional (stream t))
+  (let ((tag-value (plist-tag-value (plump:tag-name node) indicator nil)))
+    (when (and (stringp tag-value)
+               (>= (length tag-value) 2)
+               (= 48 (char-int (character (subseq tag-value 0 1)))))
+      (update-repeater node)
+      (let ((control (concatenate
+                      'string
+                      (when (eql indicator :close) "~%")
+                      (make-string *repeat-number* :initial-element
+                                   (character (subseq tag-value 1 2)))
+                      (when (eql indicator :open) "~&")
+                      (subseq tag-value 2))))
+        (format stream control) t))))
+
+(defun update-repeater (node)
+  (let ((repeat (when (or (string= "title" (plump:tag-name node))
+                          (string= "h1" (plump:tag-name node))
+                          (string= "h2" (plump:tag-name node)))
+                  (length (lquery-funcs:render-text node)))))
+    (unless (null repeat) (setf *repeat-number* repeat))))
+
 ;;;
 ;;; Reference from plump:serialize-object
 ;;; --------------------------------------------
@@ -251,7 +277,8 @@
 (defmethod element-lossy-output ((node plump:doctype)))
 (defmethod element-lossy-output ((node plump:comment)))
 (defmethod element-lossy-output ((node plump:element))
-  (final-tag-value (plump:tag-name node) :open *stream*)
+  (unless (repeater node :open *stream*)
+    (final-tag-value (plump:tag-name node) :open *stream*))
   (element-lossy-output (plump:attributes node))
   (unless (skip-children-p node)
     (loop with *record-parents* = (update-prefixer node)
@@ -259,7 +286,8 @@
           and *raw-children-text-p* = (raw-children-text-p node)
           for child across (plump:children node)
           do (element-lossy-output child)))
-  (final-tag-value (plump:tag-name node) :close *stream*))
+  (unless (repeater node :close *stream*)
+    (final-tag-value (plump:tag-name node) :close *stream*)))
 (defmethod element-lossy-output ((node plump:fulltext-element)))
 (defmethod element-lossy-output ((node plump:xml-header)))
 (defmethod element-lossy-output ((node plump:cdata)))
