@@ -16,14 +16,13 @@
   (:export #:output-markdown))
 (in-package :guetor/content-markdown)
 
-;;; Currently, only have ATX HEADING.
 ;;; Image, audio and video could not be converted nicely.
 ;;; Until have a better idea, it will stay like this.
 (define-output output-markdown
     ((:src "(~A)" :alt "[~A]" :data-language "~A~&")
-     (:name "title" :open "# " :close "~2&")
-     (:name "h1" :open "# " :close "~2&")
-     (:name "h2" :open "## " :close "~2&")
+     (:name "title" :open "0=" :close "0=~2&")
+     (:name "h1" :open "" :close "0=~2&")
+     (:name "h2" :open "" :close "0-~2&")
      (:name "h3" :open "### " :close "~2&")
      (:name "h4" :open "#### " :close "~2&")
      (:name "h5" :open "##### " :close "~2&")
