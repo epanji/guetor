@@ -16,11 +16,9 @@
   (:export #:output-markdown))
 (in-package :guetor/content-markdown)
 
-;;; Image, audio and video could not be converted nicely.
-;;; Until have a better idea, it will stay like this.
 (define-output output-markdown
-    ((:src "(~A)" :alt "[~A]" :data-language "~A~&")
-     (:name "title" :open "0=" :close "0=~2&")
+    ((:src "(~A)~2&" :alt "[~A]" :data-language "~A~&" :href "(~A)")
+     (:name "title" :open "" :close "0=~2&")
      (:name "h1" :open "" :close "0=~2&")
      (:name "h2" :open "" :close "0-~2&")
      (:name "h3" :open "### " :close "~2&")
@@ -28,9 +26,9 @@
      (:name "h5" :open "##### " :close "~2&")
      (:name "p" :open "" :close "~2&")
      (:name "cite" :open ">~&> <cite>" :close "</cite>~&" :pure-tag-p t)
-     (:name "img" :open "![" :close "]~&")
-     (:name "audio" :open "![" :close "]~&" :skip-children-p t)
-     (:name "video" :open "![" :close "]~&" :skip-children-p t)
+     (:name "img" :open "!" :close "" :swap-attributes-p t)
+     (:name "audio" :open "![]" :close "" :skip-children-p t :swap-attributes-p t)
+     (:name "video" :open "![]" :close "" :skip-children-p t :swap-attributes-p t)
      (:name "strong" :open "~/guetor-o::spacer/__" :close "__" :pure-tag-p t :style-tag-p t)
      (:name "b" :open "~/guetor-o::spacer/**" :close "**":pure-tag-p t :style-tag-p t)
      (:name "em" :open "~/guetor-o::spacer/_" :close "_" :pure-tag-p t :style-tag-p t)
@@ -40,7 +38,7 @@
      (:name "code" :open "~/guetor-o::spacer/```" :close "```" :alt-open "``` " :alt-close "```~2&" :pure-tag-p t :style-tag-p t)
      (:name "pre" :open "" :close "~&" :raw-children-text-p t)
      (:name "br" :open "~/guetor-o::spacer/" :pure-tag-p t)
-     (:name "a" :open "~/guetor-o::spacer/" :close "" :pure-tag-p t)
+     (:name "a" :open "~/guetor-o::spacer/[" :close "]" :pure-tag-p t :style-tag-p t :swap-attributes-p t)
      (:name "blockquote" :prefix "> " :absolute-prefix-p t :close "~2&")
      (:name "ul" :prefix "- " :close "~2&")
      (:name "ol" :prefix "~/guetor-o::counter/. " :close "~2&")))
