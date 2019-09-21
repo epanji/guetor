@@ -42,6 +42,7 @@
 ;;; - Undefine indicator means the value NIL or Empty.
 ;;; - Tag with different output may have alt-open and alt-close.
 ;;; - All indicator predicate does not apply for alternative.
+;;; - Use swap-attributes-p value T for attributes location after text.
 ;;;
 ;;; Property list indicator and value
 ;;; - :name "TAG-NAME"
@@ -55,6 +56,7 @@
 ;;; - :style-tag-p NIL
 ;;; - :skip-children-p NIL
 ;;; - :raw-children-text-p NIL
+;;; - :swap-attributes-p NIL
 (defvar *collection-plist-tag* nil)
 
 ;;; Format control for attribute value
@@ -279,7 +281,8 @@
 (defmethod element-lossy-output ((node plump:element))
   (unless (repeater node :open *stream*)
     (final-tag-value (plump:tag-name node) :open *stream*))
-  (element-lossy-output (plump:attributes node))
+  (unless (plist-tag-value (plump:tag-name node) :swap-attributes-p nil)
+    (element-lossy-output (plump:attributes node)))
   (unless (skip-children-p node)
     (loop with *record-parents* = (update-prefixer node)
           and *record-number* = (update-counter node)
@@ -287,7 +290,9 @@
           for child across (plump:children node)
           do (element-lossy-output child)))
   (unless (repeater node :close *stream*)
-    (final-tag-value (plump:tag-name node) :close *stream*)))
+    (final-tag-value (plump:tag-name node) :close *stream*))
+  (when (plist-tag-value (plump:tag-name node) :swap-attributes-p nil)
+    (element-lossy-output (plump:attributes node))))
 (defmethod element-lossy-output ((node plump:fulltext-element)))
 (defmethod element-lossy-output ((node plump:xml-header)))
 (defmethod element-lossy-output ((node plump:cdata)))
@@ -299,7 +304,7 @@
                           for control = (attribute-format key)
                           unless (null control)
                             collect (format nil control val))))
-    (format *stream* "~@[~{~A~^ ~}~]" attributes)))
+    (format *stream* "~@[~{~A~}~]" attributes)))
 (defmethod element-lossy-output ((node plump:nesting-node))
   (loop for child across (plump:children node)
         do (element-lossy-output child)))
