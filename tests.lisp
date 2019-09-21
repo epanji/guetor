@@ -221,17 +221,17 @@
 
 (test output-markless-for-image
   (let ((node (plump:parse "<img src=\"file.png\" />")))
-    (is (string= (format nil "[ image file.png ]~&")
+    (is (string= (format nil "[ image file.png ]~2&")
                  (output-markless node nil)))))
 
 (test output-markless-for-audio
   (let ((node (plump:parse "<audio src=\"file.mp3\">skip</audio>")))
-    (is (string= (format nil "[ audio file.mp3 ]~&")
+    (is (string= (format nil "[ audio file.mp3 ]~2&")
                  (output-markless node nil)))))
 
 (test output-markless-for-video
   (let ((node (plump:parse "<video src=\"file.mp4\">skip</video>")))
-    (is (string= (format nil "[ video file.mp4 ]~&")
+    (is (string= (format nil "[ video file.mp4 ]~2&")
                  (output-markless node nil)))))
 
 (test output-markless-for-strong
@@ -315,7 +315,6 @@
                  (output-markless node nil)))))
 
 (test output-markless-for-a
-  ;; Tag a treated as underline.
   (let ((node (plump:parse "<p>the <a href=\"#id\">link</a> text</p")))
-    (is (string= (format nil "the __link__ text~2&")
+    (is (string= (format nil "the \"link\"(#id) text~2&")
                  (output-markless node nil)))))
