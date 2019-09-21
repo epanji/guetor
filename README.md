@@ -23,7 +23,7 @@ The files that constitute GUETOR are:
   provide function to convert Plump DOM to markless format.
 
 * [Content-markdown](content-markdown.lisp)
-  provide work in progress function to convert Plump DOM to markdown format. (WIP)
+  provide function to convert Plump DOM to markdown format.
 
 Related System:
 ----------------
