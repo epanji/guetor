@@ -223,29 +223,20 @@
 
 ;;; Repeater
 ;;;
-(defvar *repeat-number* 0)
-
 (defun repeater (node indicator &optional (stream t))
   (let ((tag-value (plist-tag-value (plump:tag-name node) indicator nil)))
     (when (and (stringp tag-value)
                (>= (length tag-value) 2)
                (= 48 (char-int (character (subseq tag-value 0 1)))))
-      (update-repeater node)
-      (let ((control (concatenate
-                      'string
-                      (when (eql indicator :close) "~%")
-                      (make-string *repeat-number* :initial-element
-                                   (character (subseq tag-value 1 2)))
-                      (when (eql indicator :open) "~&")
-                      (subseq tag-value 2))))
+      (let* ((repeat-number (length (lquery-funcs:render-text node)))
+             (control (concatenate
+                       'string
+                       (when (eql indicator :close) "~%")
+                       (make-string repeat-number :initial-element
+                                    (character (subseq tag-value 1 2)))
+                       (when (eql indicator :open) "~&")
+                       (subseq tag-value 2))))
         (format stream control) t))))
-
-(defun update-repeater (node)
-  (let ((repeat (when (or (string= "title" (plump:tag-name node))
-                          (string= "h1" (plump:tag-name node))
-                          (string= "h2" (plump:tag-name node)))
-                  (length (lquery-funcs:render-text node)))))
-    (unless (null repeat) (setf *repeat-number* repeat))))
 
 ;;;
 ;;; Reference from plump:serialize-object
