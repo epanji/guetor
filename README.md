@@ -17,7 +17,7 @@ The files that constitute GUETOR are:
   provide title retriever for contents wrapper.
 
 * [Output](output.lisp)
-  provide system to be inherited by others for lossy data convertion.
+  provide system to be inherited by others for lossy data conversion.
 
 * [Content-markless](content-markless.lisp)
   provide function to convert Plump DOM to markless format.
