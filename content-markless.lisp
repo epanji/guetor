@@ -29,7 +29,7 @@
      (:name "img" :open "[ image " :close " ]~2&")
      (:name "audio" :open "[ audio " :close " ]~2&" :skip-children-p t)
      (:name "video" :open "[ video " :close " ]~2&" :skip-children-p t)
-     (:name "strong" :open "~/guetor-o::spacer/**" :close "**":pure-tag-p t :style-tag-p t)
+     (:name "strong" :open "~/guetor-o::spacer/**" :close "**" :pure-tag-p t :style-tag-p t)
      (:name "b" :open "~/guetor-o::spacer/**" :close "**" :pure-tag-p t :style-tag-p t)
      (:name "em" :open "~/guetor-o::spacer///" :close "//" :pure-tag-p t :style-tag-p t)
      (:name "i" :open "~/guetor-o::spacer///" :close "//" :pure-tag-p t :style-tag-p t)

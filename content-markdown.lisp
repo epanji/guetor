@@ -30,7 +30,7 @@
      (:name "audio" :open "![]" :close "" :skip-children-p t :swap-attributes-p t)
      (:name "video" :open "![]" :close "" :skip-children-p t :swap-attributes-p t)
      (:name "strong" :open "~/guetor-o::spacer/__" :close "__" :pure-tag-p t :style-tag-p t)
-     (:name "b" :open "~/guetor-o::spacer/**" :close "**":pure-tag-p t :style-tag-p t)
+     (:name "b" :open "~/guetor-o::spacer/**" :close "**" :pure-tag-p t :style-tag-p t)
      (:name "em" :open "~/guetor-o::spacer/_" :close "_" :pure-tag-p t :style-tag-p t)
      (:name "i" :open "~/guetor-o::spacer/*" :close "*" :pure-tag-p t :style-tag-p t)
      (:name "u" :open "~/guetor-o::spacer/<u>" :close "</u>" :pure-tag-p t :style-tag-p t)
