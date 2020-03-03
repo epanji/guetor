@@ -65,7 +65,7 @@
                                  (string *navigation-direction*)
                                  (navigation-text))))
         ((string-equal (subseq string 0 4)
-                       (subseq *standard-forward-text* 0 4))
+                       (subseq *standard-domain-text* 0 4))
          string)
         ((string= *navigation-base* *standard-domain-text*)
          (error 'navigation-base-unset
