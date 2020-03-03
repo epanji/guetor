@@ -69,7 +69,8 @@
          string)
         ((string= *navigation-base* *standard-domain-text*)
          (error 'navigation-base-unset
-                :message "Not set *navigation-base* yet.~%"))
+                :message (format nil "Variable *navigation-base* is not set. ~
+Use prepare-navigation-text to set it up.~%")))
         (t
          (concatenate 'string *navigation-base* string))))
 
