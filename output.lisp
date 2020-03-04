@@ -19,6 +19,7 @@
   (:nicknames :guetor-o)
   (:use :cl)
   (:import-from :plump #:*stream*)
+  (:import-from :lquery)
   (:export #:*collection-plist-tag*
            #:*plist-attribute*
            ;; ---------------------
