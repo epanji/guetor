@@ -2,7 +2,7 @@
 
 (defpackage :guetor/title
   (:nicknames :guetor-t)
-  (:use :cl)
+  (:use :cl :guetor/condition)
   (:import-from :lquery)
   (:export #:*header-selector*
            #:*header-position*
@@ -10,7 +10,7 @@
            #:title))
 (in-package :guetor/title)
 
-(defparameter *header-selector* "h1, h2, h3, h4, h5, title")
+(defparameter *header-selector* "title, h1, h2, h3, h4, h5")
 (defparameter *header-position* 0)
 
 
@@ -19,11 +19,20 @@
   (plusp (length (clss:select *header-selector* node))))
 
 (defun find-header (node &optional fn)
-  (loop for result = (clss:select *header-selector* node)
+  (loop with last = (if (plump:root-p node)
+                        (length
+                         (warn 'title-less-accurate
+                               :message
+                               #.(format nil "Searching title should ~
+                               be from specific to less specific.~%~
+                               ~9TOtherwise it will be less accurate.")))
+                        (plump:element-position node))
+        for result = (clss:select *header-selector* node)
         until (or (plump:root-p node)
-                  (plusp (length result))
-                  (zerop (plump:element-position node)))
-        do (setf node (funcall (or fn 'plump:previous-element) node))
+                  (and (plusp (length result))
+                       (>= last (plump:element-position node))))
+        do (setf last (plump:element-position node)
+                 node (funcall (or fn 'plump:previous-element) node))
         finally (return result)))
 
 
@@ -67,3 +76,7 @@ This function will return the TITLE and PREDICATE for node having title.
 
 (defmethod guess-title ((node vector) (key (eql :text)))
   (lquery-funcs:text (or (guess-title node :element) (make-string 0))))
+
+;;; Conditions
+
+(define-condition title-less-accurate (guetor-warning) ())
