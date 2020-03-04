@@ -65,7 +65,7 @@
                 :message (format nil "No navigation ~(~A~) with text ~S.~%"
                                  (string *navigation-direction*)
                                  (navigation-text))))
-        ((string-equal (subseq string 0 4)
+        ((string-equal (subseq string 0 (min 4 (length string)))
                        (subseq *standard-domain-text* 0 4))
          string)
         ((string= *navigation-base* *standard-domain-text*)
