@@ -3,6 +3,7 @@
 (defpackage :guetor/navigation
   (:nicknames :guetor-nav)
   (:use :cl :guetor/condition)
+  (:import-from :lquery)
   (:export #:*standard-domain-text*
            #:*standard-forward-text*
            #:*standard-backward-text*
@@ -85,7 +86,7 @@ Use prepare-navigation-text to set it up.~%")))
 
 (defun find-navigation (working-nodes &optional direction)
   (let* ((*navigation-direction* (or direction *navigation-direction*))
-         (node (find-navigation-node working-nodes)))
+         (node (find-navigation-node (lquery-funcs:root working-nodes))))
     (lquery-funcs:attr node :href)
     (complete-navigation-href (lquery-funcs:node node))))
 
