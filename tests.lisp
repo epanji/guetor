@@ -13,16 +13,38 @@
   (let ((*mode* mode))
     (&body)))
 
+(def-suite :condition)
 (def-suite :content)
 (def-suite :title)
 (def-suite :output)
+(def-suite :navigation)
 (def-suite :content-markless)
+(def-suite :content-markdown)
 
 (defun suite-tests ()
+  (run! :condition)
   (run! :content)
   (run! :title)
   (run! :output)
-  (run! :content-markless))
+  (run! :navigation)
+  (run! :content-markless)
+  (run! :content-markdown))
+
+(in-suite :condition)
+
+(test inherited-symbols
+  (is (eql :INHERITED
+           (nth-value 1 (find-symbol
+                         "GUETOR-CONDITION"
+                         :guetor))))
+  (is (eql :INHERITED
+           (nth-value 1 (find-symbol
+                         "GUETOR-ERROR"
+                         :guetor))))
+  (is (eql :INHERITED
+           (nth-value 1 (find-symbol
+                         "GUETOR-WARNING"
+                         :guetor)))))
 
 (in-suite :content)
 
@@ -119,20 +141,20 @@
 
 (test title-as-plump-dom-element
   (let ((node (contents-wrapper
-                (merge-pathnames *test-file* *test-directory*)
-                t)))
+               (merge-pathnames *test-file* *test-directory*)
+               t)))
     (is (typep (title node :element) 'plump-dom:element))))
 
 (test title-as-text
   (let ((node (contents-wrapper
-                (merge-pathnames *test-file* *test-directory*)
-                t)))
+               (merge-pathnames *test-file* *test-directory*)
+               t)))
     (is (typep (title node :text) 'string))))
 
 (test title-as-vector
   (let ((node (contents-wrapper
-                (merge-pathnames *test-file* *test-directory*)
-                t)))
+               (merge-pathnames *test-file* *test-directory*)
+               t)))
     (is (typep (title node :element-vector) 'vector))
     (is (typep (title node :text-vector) 'vector))))
 
@@ -163,6 +185,20 @@
            (nth-value 1 (find-symbol
                          "DEFINE-OUTPUT"
                          :guetor/output)))))
+
+(in-suite :navigation)
+
+(test find-navigation-forward
+  (let ((path (merge-pathnames *test-file* *test-directory*))
+        (*navigation-base* "https://sample.org"))
+    (is (concatenate 'string "/next" *navigation-base*)
+        (find-navigation (guetor:document path)))))
+
+(test find-navigation-backward
+  (let ((path (merge-pathnames *test-file* *test-directory*))
+        (*navigation-base* "https://sample.org"))
+    (is (concatenate 'string "/prev" *navigation-base*)
+        (find-navigation (guetor:document path) :backward))))
 
 (in-suite :content-markless)
 
@@ -318,3 +354,155 @@
   (let ((node (plump:parse "<p>the <a href=\"#id\">link</a> text</p")))
     (is (string= (format nil "the \"link\"(#id) text~2&")
                  (output-markless node nil)))))
+
+(in-suite :content-markdown)
+
+(test output-markdown-for-first-header
+  (let ((node (plump:parse "<h1>header 1</h1>")))
+    (is (string= (format nil "header 1~&========~2&")
+                 (output-markdown node nil)))))
+
+(test output-markdown-for-second-header
+  (let ((node (plump:parse "<h2>header 2</h2>")))
+    (is (string= (format nil "header 2~&--------~2&")
+                 (output-markdown node nil)))))
+
+(test output-markdown-for-third-header
+  (let ((node (plump:make-element (plump:make-root) "h3")))
+    (is (string= (format nil "### ~2&") (output-markdown node nil)))))
+
+(test output-markdown-for-forth-header
+  (let ((node (plump:make-element (plump:make-root) "h4")))
+    (is (string= (format nil "#### ~2&") (output-markdown node nil)))))
+
+(test output-markdown-for-fifth-header
+  (let ((node (plump:make-element (plump:make-root) "h5")))
+    (is (string= (format nil "##### ~%~2&") (output-markdown node nil)))))
+
+(test output-markdown-for-paragraph
+  (let ((node (plump:parse "<p>paragraph</p>")))
+    (is (string= (format nil "paragraph~2&") (output-markdown node nil)))))
+
+(test output-markdown-for-blockquote
+  (let* ((html "<blockquote><p>it's</p><cite>me</cite></blockquote>")
+         (node (plump:parse html)))
+    (is (string= (format nil "> it's~&>~&> <cite>me</cite>~2&")
+                 (output-markdown node nil)))))
+
+(test output-markdown-for-cite
+  (let ((node (plump:parse "<cite>name</cite>")))
+    (is (string= (format nil ">~&> <cite>name</cite>~&")
+                 (output-markdown node nil)))))
+
+(test output-markdown-for-li
+  ;; Nested
+  (let ((node-ul (plump:parse "<ul><li><p>a</p></li><li><p>b</p></li></ul>"))
+        (node-ol (plump:parse "<ol><li><p>a</p></li><li><p>b</p></li></ol>"))
+        (node-nested (plump:parse "<ol><li><p>a</p></li><li><p>b</p><ul>
+<li><p>ba</p></li><li><p>bb</p></li></ul></li></ol>")))
+    (is (string= (format nil "- a~&- b~2&") (output-markdown node-ul nil)))
+    (is (string= (format nil "1. a~&2. b~2&")
+                 (output-markdown node-ol nil)))
+    (is (string= (format nil "1. a~&2. b~&   - ba~&   - bb~2&")
+                 (output-markdown node-nested nil)))))
+
+(test output-markdown-for-image
+  (let ((node (plump:parse "<img src=\"file.png\" />")))
+    (is (string= (format nil "!(file.png)~2&")
+                 (output-markdown node nil)))))
+
+(test output-markdown-for-audio
+  (let ((node (plump:parse "<audio src=\"file.mp3\">skip</audio>")))
+    (is (string= (format nil "![](file.mp3)~2&")
+                 (output-markdown node nil)))))
+
+(test output-markdown-for-video
+  (let ((node (plump:parse "<video src=\"file.mp4\">skip</video>")))
+    (is (string= (format nil "![](file.mp4)~2&")
+                 (output-markdown node nil)))))
+
+(test output-markdown-for-strong
+  (let ((node (plump:parse "<strong>bold</strong>"))
+        (node-for-spacer-test
+          (plump:parse
+           "<p>the <strong>text</strong> is <strong>bold</strong>!</p>")))
+    (is (string= (format nil "__bold__") (output-markdown node nil)))
+    (is (string= (format nil "the __text__ is __bold__!~2&")
+                 (output-markdown node-for-spacer-test nil)))))
+
+(test output-markdown-for-b
+  (let ((node (plump:parse "<b>bold</b>"))
+        (node-for-spacer-test
+          (plump:parse
+           "<p>the <b>text</b> is <b>bold</b>!</p>")))
+    (is (string= (format nil "**bold**") (output-markdown node nil)))
+    (is (string= (format nil "the **text** is **bold**!~2&")
+                 (output-markdown node-for-spacer-test nil)))))
+
+(test output-markdown-for-em
+  (let ((node (plump:parse "<em>italic</em>"))
+        (node-for-spacer-test
+          (plump:parse
+           "<p>the <em>text</em> is <em>italic</em>!</p>")))
+    (is (string= (format nil "_italic_") (output-markdown node nil)))
+    (is (string= (format nil "the _text_ is _italic_!~2&")
+                 (output-markdown node-for-spacer-test nil)))))
+
+(test output-markdown-for-i
+  (let ((node (plump:parse "<i>italic</i>"))
+        (node-for-spacer-test
+          (plump:parse
+           "<p>the <i>text</i> is <i>italic</i>!</p>")))
+    (is (string= (format nil "*italic*") (output-markdown node nil)))
+    (is (string= (format nil "the *text* is *italic*!~2&")
+                 (output-markdown node-for-spacer-test nil)))))
+
+(test output-markdown-for-u
+  (let ((node (plump:parse "<u>underline</u>"))
+        (node-for-spacer-test
+          (plump:parse
+           "<p>the <u>text</u> is <u>underline</u>!</p>")))
+    (is (string= (format nil "<u>underline</u>") (output-markdown node nil)))
+    (is (string= (format nil "the <u>text</u> is <u>underline</u>!~2&")
+                 (output-markdown node-for-spacer-test nil)))))
+
+(test output-markdown-for-s
+  (let ((node (plump:parse "<s>strikethrough</s>"))
+        (node-for-spacer-test
+          (plump:parse
+           "<p>the <s>text</s> is <s>strikethrough</s>!</p>")))
+    (is (string= (format nil "<s>strikethrough</s>")
+                 (output-markdown node nil)))
+    (is (string= (format nil "the <s>text</s> is <s>strikethrough</s>!~2&")
+                 (output-markdown node-for-spacer-test nil)))))
+
+(test output-markdown-for-code
+  (let ((node (plump:parse
+               (concatenate 'string
+                            "<code data-language=\"common-lisp\">"
+                            "<pre>(+ 1 2)"
+                            (string #\Newline)
+                            "(+ 1 2 3)"
+                            "</pre>"
+                            "</code>")))
+        (node-inline
+          (plump:parse "<p>Nibh <code>tortor</code> id aliquet!</p>")))
+    (is (string= (format nil "``` common-lisp~&(+ 1 2)~&(+ 1 2 3)~&```~2&")
+                 (output-markdown node nil)))
+    (is (string= (format nil "Nibh ```tortor``` id aliquet!~2&")
+                 (output-markdown node-inline nil)))))
+
+(test output-markdown-for-pre
+  (let ((node (plump:parse "<pre>(+ 1 2)</pre>")))
+    (is (string= (format nil "(+ 1 2)~&") (output-markdown node nil)))))
+
+(test output-markdown-for-br
+  ;; Tag br treated as spacer.
+  (let ((node (plump:parse "<p>one<br>two three</p>")))
+    (is (string= (format nil "one two three~2&")
+                 (output-markdown node nil)))))
+
+(test output-markdown-for-a
+  (let ((node (plump:parse "<p>the <a href=\"#id\">link</a> text</p")))
+    (is (string= (format nil "the [link](#id) text~2&")
+                 (output-markdown node nil)))))
