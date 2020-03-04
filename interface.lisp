@@ -26,6 +26,7 @@
    #:title
    ;; guetor/navigation
    #:*navigation-base*
+   #:*navigation-index*
    #:*navigation-direction*
    #:prepare-navigation-text
    #:find-navigation
