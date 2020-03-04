@@ -10,6 +10,9 @@ The files that constitute GUETOR are:
 * [Interface](interface.lisp)
   provide internal and external symbol for GUETOR system.
 
+* [Condition](condition.lisp)
+  provide internal conditions for GUETOR system.
+
 * [Content](content.lisp)
   provide automatic selector, custom selector and contents wrapper retriever.
 
@@ -18,6 +21,9 @@ The files that constitute GUETOR are:
 
 * [Output](output.lisp)
   provide system to be inherited by others for lossy data conversion.
+
+* [Navigation](navigation.lisp)
+  provide navigation text retriever for url forward or backward direction.
 
 * [Content-markless](content-markless.lisp)
   provide function to convert Plump DOM to markless format.
@@ -74,6 +80,25 @@ Get title with two values as results. First is the title and second is predicate
 (guetor:title (guetor:contents-wrapper #p"test.html" t) :text)
 => "Arcu, non sodales!"
 => T
+```
+
+Get url string for forward or backward navigation.
+
+``` common-lisp
+(let ((guetor:*navigation-base* "http://sample.com")
+      (guetor:*navigation-direction* :forward))
+  (guetor:find-navigation (guetor:document #p"test.html")))
+=> "http://sample.com/next"
+(let ((guetor:*navigation-base* "http://sample.com"))
+  (guetor:find-navigation (guetor:document #p"test.html") :forward))
+=> "http://sample.com/next"
+(let ((guetor:*navigation-base* "http://sample.com")
+      (guetor:*navigation-direction* :backward))
+  (guetor:find-navigation (guetor:document #p"test.html")))
+=> "http://sample.com/prev"
+(let ((guetor:*navigation-base* "http://sample.com"))
+  (guetor:find-navigation (guetor:document #p"test.html") :backward))
+=> "http://sample.com/prev"
 ```
 
 How to convert?
@@ -138,73 +163,15 @@ Tests
 -----
 
 ``` common-lisp
-CL-USER> (asdf:test-system "guetor")
-
-Running test suite CONTENT
- Running test NEW-DOCUMENT-SELECTOR .
- Running test NEW-DOCUMENT-LAST-SELECTOR ..
- Running test OLD-DOCUMENT-LAST-SELECTOR .
- Running test OLD-DOCUMENT-CUSTOM-SELECTOR ..
- Running test NEW-DOCUMENT-CUSTOM-SELECTOR ..
- Running test NEW-DOCUMENT-FULL-MODE-SELECTOR ..
- Running test NEW-DOCUMENT-DEFAULT-SELECTOR .
- Running test GUESS-SELECTOR-CONTENTS-WRAPPER .
- Running test CUSTOM-SELECTOR-CONTENTS-WRAPPER ..
- Running test ONLY-FIRST-GUESS-SELECTOR ...
- Did 17 checks.
-    Pass: 17 (100%)
-    Skip: 0 ( 0%)
-    Fail: 0 ( 0%)
-
-
-Running test suite TITLE
- Running test TITLE-FROM-CONTENTS-WRAPPER ..
- Running test TITLE-FROM-OUTSIDE-CONTENTS ..
- Running test TITLE-AS-PLUMP-DOM-ELEMENT .
- Running test TITLE-AS-TEXT .
- Running test TITLE-AS-VECTOR ..
- Did 8 checks.
-    Pass: 8 (100%)
-    Skip: 0 ( 0%)
-    Fail: 0 ( 0%)
-
-
-Running test suite OUTPUT
- Running test EXPORTED-SYMBOLS ......
- Did 6 checks.
-    Pass: 6 (100%)
-    Skip: 0 ( 0%)
-    Fail: 0 ( 0%)
-
-
-Running test suite CONTENT-MARKLESS
- Running test CONTENTS-WRAPPER-TO-MARKLESS-STRING .
- Running test OUTPUT-MARKLESS-FOR-FIRST-HEADER .
- Running test OUTPUT-MARKLESS-FOR-SECOND-HEADER .
- Running test OUTPUT-MARKLESS-FOR-THIRD-HEADER .
- Running test OUTPUT-MARKLESS-FOR-FORTH-HEADER .
- Running test OUTPUT-MARKLESS-FOR-FIFTH-HEADER .
- Running test OUTPUT-MARKLESS-FOR-PARAGRAPH .
- Running test OUTPUT-MARKLESS-FOR-BLOCKQUOTE .
- Running test OUTPUT-MARKLESS-FOR-CITE .
- Running test OUTPUT-MARKLESS-FOR-LI ...
- Running test OUTPUT-MARKLESS-FOR-IMAGE .
- Running test OUTPUT-MARKLESS-FOR-AUDIO .
- Running test OUTPUT-MARKLESS-FOR-VIDEO .
- Running test OUTPUT-MARKLESS-FOR-STRONG ..
- Running test OUTPUT-MARKLESS-FOR-B ..
- Running test OUTPUT-MARKLESS-FOR-EM ..
- Running test OUTPUT-MARKLESS-FOR-I ..
- Running test OUTPUT-MARKLESS-FOR-U ..
- Running test OUTPUT-MARKLESS-FOR-S ..
- Running test OUTPUT-MARKLESS-FOR-CODE ..
- Running test OUTPUT-MARKLESS-FOR-PRE .
- Running test OUTPUT-MARKLESS-FOR-BR .
- Running test OUTPUT-MARKLESS-FOR-A .
- Did 32 checks.
-    Pass: 32 (100%)
-    Skip: 0 ( 0%)
-    Fail: 0 ( 0%)
-
-T
+CL-USER> (with-open-file (stream #p"tests-result.txt"
+                                 :direction :output
+                                 :if-exists :supersede
+                                 :if-does-not-exist :create)
+           (let ((*standard-output* stream))
+             (format stream "<pre>~&")
+             (asdf:test-system "guetor")
+             (format stream "~%</pre>")))
+=> NIL
 ```
+
+_Open tests result [HERE](tests-result.txt)._
