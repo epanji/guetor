@@ -24,7 +24,7 @@
 
 (defparameter *standard-domain-text* "http://domain.com")
 (defparameter *standard-forward-text* "Next")
-(defparameter *standard-backward-text* "Previous")
+(defparameter *standard-backward-text* "Prev")
 
 (defparameter *navigation-base* *standard-domain-text*)
 (declaim (string *standard-domain-text*
