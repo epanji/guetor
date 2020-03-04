@@ -75,10 +75,11 @@ Use prepare-navigation-text to set it up.~%")))
          (concatenate 'string *navigation-base* string))))
 
 (defun find-navigation-node (working-nodes)
-  (lquery:$ working-nodes "a"
+  (lquery:$ working-nodes "link, a"
     (filter (lambda (node)
               (when (navigation-text-equal
-                     (lquery-funcs:render-text node)
+                     (or (lquery-funcs:attr node :rel)
+                         (lquery-funcs:render-text node))
                      (navigation-text))
                 node)))))
 
