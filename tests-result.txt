@@ -1,0 +1,109 @@
+<pre>
+
+Running test suite CONDITION
+ Running test INHERITED-SYMBOLS ...
+ Did 3 checks.
+    Pass: 3 (100%)
+    Skip: 0 ( 0%)
+    Fail: 0 ( 0%)
+
+Running test suite CONTENT
+ Running test NEW-DOCUMENT-SELECTOR .
+ Running test NEW-DOCUMENT-LAST-SELECTOR ..
+ Running test OLD-DOCUMENT-LAST-SELECTOR .
+ Running test OLD-DOCUMENT-CUSTOM-SELECTOR ..
+ Running test NEW-DOCUMENT-CUSTOM-SELECTOR ..
+ Running test NEW-DOCUMENT-FULL-MODE-SELECTOR ..
+ Running test NEW-DOCUMENT-DEFAULT-SELECTOR .
+ Running test GUESS-SELECTOR-CONTENTS-WRAPPER .
+ Running test CUSTOM-SELECTOR-CONTENTS-WRAPPER ..
+ Running test ONLY-FIRST-GUESS-SELECTOR ...
+ Did 17 checks.
+    Pass: 17 (100%)
+    Skip: 0 ( 0%)
+    Fail: 0 ( 0%)
+
+Running test suite TITLE
+ Running test TITLE-FROM-CONTENTS-WRAPPER ..
+ Running test TITLE-FROM-OUTSIDE-CONTENTS ..
+ Running test TITLE-AS-PLUMP-DOM-ELEMENT .
+ Running test TITLE-AS-TEXT .
+ Running test TITLE-AS-VECTOR ..
+ Did 8 checks.
+    Pass: 8 (100%)
+    Skip: 0 ( 0%)
+    Fail: 0 ( 0%)
+
+Running test suite OUTPUT
+ Running test EXPORTED-SYMBOLS ......
+ Did 6 checks.
+    Pass: 6 (100%)
+    Skip: 0 ( 0%)
+    Fail: 0 ( 0%)
+
+Running test suite NAVIGATION
+ Running test FIND-NAVIGATION-FORWARD .
+ Running test FIND-NAVIGATION-BACKWARD .
+ Did 2 checks.
+    Pass: 2 (100%)
+    Skip: 0 ( 0%)
+    Fail: 0 ( 0%)
+
+Running test suite CONTENT-MARKLESS
+ Running test CONTENTS-WRAPPER-TO-MARKLESS-STRING .
+ Running test OUTPUT-MARKLESS-FOR-FIRST-HEADER .
+ Running test OUTPUT-MARKLESS-FOR-SECOND-HEADER .
+ Running test OUTPUT-MARKLESS-FOR-THIRD-HEADER .
+ Running test OUTPUT-MARKLESS-FOR-FORTH-HEADER .
+ Running test OUTPUT-MARKLESS-FOR-FIFTH-HEADER .
+ Running test OUTPUT-MARKLESS-FOR-PARAGRAPH .
+ Running test OUTPUT-MARKLESS-FOR-BLOCKQUOTE .
+ Running test OUTPUT-MARKLESS-FOR-CITE .
+ Running test OUTPUT-MARKLESS-FOR-LI ...
+ Running test OUTPUT-MARKLESS-FOR-IMAGE .
+ Running test OUTPUT-MARKLESS-FOR-AUDIO .
+ Running test OUTPUT-MARKLESS-FOR-VIDEO .
+ Running test OUTPUT-MARKLESS-FOR-STRONG ..
+ Running test OUTPUT-MARKLESS-FOR-B ..
+ Running test OUTPUT-MARKLESS-FOR-EM ..
+ Running test OUTPUT-MARKLESS-FOR-I ..
+ Running test OUTPUT-MARKLESS-FOR-U ..
+ Running test OUTPUT-MARKLESS-FOR-S ..
+ Running test OUTPUT-MARKLESS-FOR-CODE ..
+ Running test OUTPUT-MARKLESS-FOR-PRE .
+ Running test OUTPUT-MARKLESS-FOR-BR .
+ Running test OUTPUT-MARKLESS-FOR-A .
+ Did 32 checks.
+    Pass: 32 (100%)
+    Skip: 0 ( 0%)
+    Fail: 0 ( 0%)
+
+Running test suite CONTENT-MARKDOWN
+ Running test OUTPUT-MARKDOWN-FOR-FIRST-HEADER .
+ Running test OUTPUT-MARKDOWN-FOR-SECOND-HEADER .
+ Running test OUTPUT-MARKDOWN-FOR-THIRD-HEADER .
+ Running test OUTPUT-MARKDOWN-FOR-FORTH-HEADER .
+ Running test OUTPUT-MARKDOWN-FOR-FIFTH-HEADER .
+ Running test OUTPUT-MARKDOWN-FOR-PARAGRAPH .
+ Running test OUTPUT-MARKDOWN-FOR-BLOCKQUOTE .
+ Running test OUTPUT-MARKDOWN-FOR-CITE .
+ Running test OUTPUT-MARKDOWN-FOR-LI ...
+ Running test OUTPUT-MARKDOWN-FOR-IMAGE .
+ Running test OUTPUT-MARKDOWN-FOR-AUDIO .
+ Running test OUTPUT-MARKDOWN-FOR-VIDEO .
+ Running test OUTPUT-MARKDOWN-FOR-STRONG ..
+ Running test OUTPUT-MARKDOWN-FOR-B ..
+ Running test OUTPUT-MARKDOWN-FOR-EM ..
+ Running test OUTPUT-MARKDOWN-FOR-I ..
+ Running test OUTPUT-MARKDOWN-FOR-U ..
+ Running test OUTPUT-MARKDOWN-FOR-S ..
+ Running test OUTPUT-MARKDOWN-FOR-CODE ..
+ Running test OUTPUT-MARKDOWN-FOR-PRE .
+ Running test OUTPUT-MARKDOWN-FOR-BR .
+ Running test OUTPUT-MARKDOWN-FOR-A .
+ Did 31 checks.
+    Pass: 31 (100%)
+    Skip: 0 ( 0%)
+    Fail: 0 ( 0%)
+
+</pre>
