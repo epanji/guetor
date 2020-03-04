@@ -8,6 +8,7 @@
            #:*standard-forward-text*
            #:*standard-backward-text*
            #:*navigation-base*
+           #:*navigation-index*
            #:*navigation-direction*
            #:prepare-navigation-text
            #:navigation-text
@@ -31,6 +32,10 @@
                  *standard-forward-text*
                  *standard-backward-text*
                  *navigation-base*))
+
+(defparameter *navigation-index* nil
+  "Index for multiple navigation with the same text.
+Set to NIL will make navigation choose last index by default.")
 
 (defparameter *navigation-direction* :forward
   "Direction for navigation with optional :FORWARD or :BACKWARD.")
@@ -86,9 +91,10 @@ Use prepare-navigation-text to set it up.~%")))
 
 (defun find-navigation (working-nodes &optional direction)
   (let* ((*navigation-direction* (or direction *navigation-direction*))
-         (node (find-navigation-node (lquery-funcs:root working-nodes))))
+         (node (find-navigation-node (lquery-funcs:root working-nodes)))
+         (index (or *navigation-index* (max 0 (1- (length node))))))
     (lquery-funcs:attr node :href)
-    (complete-navigation-href (lquery-funcs:node node))))
+    (complete-navigation-href (lquery-funcs:node node index))))
 
 ;;; Conditions
 
