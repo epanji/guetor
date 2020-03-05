@@ -7,6 +7,7 @@
   (:export #:*standard-domain-text*
            #:*standard-forward-text*
            #:*standard-backward-text*
+           #:*navigation-selector*
            #:*navigation-base*
            #:*navigation-index*
            #:*navigation-direction*
@@ -27,15 +28,18 @@
 (defparameter *standard-forward-text* "Next")
 (defparameter *standard-backward-text* "Prev")
 
+(defparameter *navigation-selector* "link, a")
 (defparameter *navigation-base* *standard-domain-text*)
 (declaim (string *standard-domain-text*
                  *standard-forward-text*
                  *standard-backward-text*
+                 *navigation-selector*
                  *navigation-base*))
 
 (defparameter *navigation-index* nil
   "Index for multiple navigation with the same text.
 Set to NIL will make navigation choose last index by default.")
+(declaim (type (or integer null) *navigation-index*))
 
 (defparameter *navigation-direction* :forward
   "Direction for navigation with optional :FORWARD or :BACKWARD.")
@@ -75,13 +79,14 @@ Set to NIL will make navigation choose last index by default.")
          string)
         ((string= *navigation-base* *standard-domain-text*)
          (error 'navigation-base-unset
-                :message (format nil "Variable *navigation-base* is not set. ~
-Use prepare-navigation-text to set it up.~%")))
+                :message (format nil "Variable *navigation-base* is ~
+                                 not set. Use prepare-navigation-text ~
+                                 to set it up.~%")))
         (t
          (concatenate 'string *navigation-base* string))))
 
 (defun find-navigation-node (working-nodes)
-  (lquery:$ working-nodes "link, a"
+  (lquery:$ working-nodes *navigation-selector*
     (filter (lambda (node)
               (when (navigation-text-equal
                      (or (lquery-funcs:attr node :rel)
