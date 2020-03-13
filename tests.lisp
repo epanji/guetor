@@ -53,6 +53,24 @@
                              </code>"))
     ("code-in" . "<p>Nibh <code>tortor</code> id aliquet!</p>")
     ("pre" . "<pre>(+ 1 2)</pre>")
+    ("table" . "<table>
+                  <thead>
+                    <tr>
+                      <th>a</th>
+                      <th>b</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>c</td>
+                      <td>d</td>
+                    </tr>
+                    <tr>
+                      <td>e</td>
+                      <td>f</td>
+                    </tr>
+                  </tbody>
+                </table>")
     ("br" . "<p>one<br>two three</p>")
     ("a" . "<p>the <a href=\"#id\">link</a> text</p")))
 
@@ -530,3 +548,9 @@
   (let ((fun (function output-markdown)))
     (is (string= (output-from-sample "a" fun)
                  (format nil "the [link](#id) text~2&")))))
+
+(test output-markdown-for-table
+  (let ((fun (function output-markdown)))
+    (is (string= (output-from-sample "table" fun)
+                 (format nil "~%| a | b | ~&|---|---|~
+                              ~&| c | d | ~&| e | f | ~&")))))
