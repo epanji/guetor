@@ -24,6 +24,7 @@
      (:name "h3" :open "### " :close "~2&")
      (:name "h4" :open "#### " :close "~2&")
      (:name "h5" :open "##### " :close "~2&")
+     (:name "h6" :open "###### " :close "~2&")
      (:name "p" :open "" :close "~2&")
      (:name "cite" :open "~~ " :close "~&" :pure-tag-p t)
      (:name "img" :open "[ image " :close " ]~2&")
