@@ -18,12 +18,13 @@
 
 (define-output output-markdown
     ((:src "(~A)~2&" :alt "[~A]" :data-language "~A~&" :href "(~A)")
-     (:name "title" :open "" :close "0=~2&")
-     (:name "h1" :open "" :close "0=~2&")
-     (:name "h2" :open "" :close "0-~2&")
+     (:name "title" :open "" :close "0=~2&") ;0repeaterEOL
+     (:name "h1" :open "" :close "0=~2&")    ;0repeaterEOL
+     (:name "h2" :open "" :close "0-~2&")    ;0repeaterEOL
      (:name "h3" :open "### " :close "~2&")
      (:name "h4" :open "#### " :close "~2&")
      (:name "h5" :open "##### " :close "~2&")
+     (:name "h6" :open "###### " :close "~2&")
      (:name "p" :open "" :close "~2&")
      (:name "cite" :open ">~&> <cite>" :close "</cite>~&" :pure-tag-p t)
      (:name "img" :open "!" :close "" :swap-attributes-p t)
