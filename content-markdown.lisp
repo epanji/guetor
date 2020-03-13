@@ -42,4 +42,9 @@
      (:name "a" :open "~/guetor-o::spacer/[" :close "]" :pure-tag-p t :style-tag-p t :swap-attributes-p t)
      (:name "blockquote" :prefix "> " :absolute-prefix-p t :close "~2&")
      (:name "ul" :prefix "- " :close "~2&")
-     (:name "ol" :prefix "~/guetor-o::counter/. " :close "~2&")))
+     (:name "ol" :prefix "~/guetor-o::counter/. " :close "~2&")
+     (:name "table" :open "~%" :close "~&")
+     (:name "thead" :open "" :close "|0---0|~&") ;side0midle0delimiterEOL
+     (:name "tr" :open "| " :close "~&")
+     (:name "th" :open "" :close " | ")
+     (:name "td" :open "" :close " | ")))
