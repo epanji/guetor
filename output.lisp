@@ -118,6 +118,7 @@
         ((string= (plump:tag-name node) "li")
          (incf *record-number* +delta-number+))
         (t *record-number*)))
+
 
 ;;; Spacer
 ;;;
@@ -142,6 +143,7 @@
     (when (plusp length)
       (setf *record-string* (tail-string no-digit))))
   string)
+
 
 ;;; Prefixer
 ;;;
@@ -175,6 +177,7 @@
     (if (plusp (length string))
         (cons (plump:tag-name node) *record-parents*)
         *record-parents*)))
+
 
 ;;; Finalizer
 ;;;
@@ -222,6 +225,7 @@
         (princ +space-string+ stream))))
   (princ string stream))
 
+
 ;;; Repeater
 ;;;
 (defun repeater (node indicator &optional (stream t))
@@ -239,6 +243,34 @@
                        (subseq tag-value 2))))
         (format stream control) t))))
 
+
+;;; Delimiter
+;;;
+(defun delimiter (node indicator &optional (stream t))
+  (let ((tag-value (plist-tag-value (plump:tag-name node) indicator nil)))
+    (when (and (stringp tag-value)
+               (>= (length tag-value) 3)
+               (= 48 (char-int (character (subseq tag-value 1 2))))
+               (= 2 (count #\0 tag-value)))
+      (let* ((position-1 (position #\0 tag-value))
+             (position-2 (position #\0 tag-value :from-end t))
+             (size (length (lquery-funcs:children
+                            (lquery-funcs:children node))))
+             (side (subseq tag-value 0 position-1))
+             (middle (subseq tag-value (1+ position-1) position-2))
+             (end (string-trim (coerce "0123456789~%&" 'list)
+                               (subseq tag-value position-2)))
+             (delimiter (if (zerop (length end)) side end))
+             (control (concatenate 'string
+                                   "~A~{~A~^" delimiter
+                                   "~}~A"
+                                   (subseq tag-value
+                                           (+ 1 position-2 (length end))))))
+        (format stream control
+                side (make-list size :initial-element middle) side)
+        t))))
+
+
 ;;;
 ;;; Reference from plump:serialize-object
 ;;; --------------------------------------------
@@ -271,7 +303,8 @@
 (defmethod element-lossy-output ((node plump:doctype)))
 (defmethod element-lossy-output ((node plump:comment)))
 (defmethod element-lossy-output ((node plump:element))
-  (unless (repeater node :open *stream*)
+  (unless (or (repeater node :open *stream*)
+              (delimiter node :open *stream*))
     (final-tag-value (plump:tag-name node) :open *stream*))
   (when (and (not (plist-tag-value (plump:tag-name node)
                                    :swap-attributes-p nil))
@@ -283,7 +316,8 @@
           and *raw-children-text-p* = (raw-children-text-p node)
           for child across (plump:children node)
           do (element-lossy-output child)))
-  (unless (repeater node :close *stream*)
+  (unless (or (repeater node :close *stream*)
+              (delimiter node :close *stream*))
     (final-tag-value (plump:tag-name node) :close *stream*))
   (when (and (plist-tag-value (plump:tag-name node) :swap-attributes-p nil)
              (plist-tag (plump:tag-name node)))
