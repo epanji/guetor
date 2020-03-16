@@ -157,6 +157,10 @@ Ultricies leo integer malesuada nunc vel risus commodo viverra maecenas accumsan
 "
 ```
 
+Convert to markdown by GUETOR. Animation below may become unrelevant in the future. It purposefully to show what we can do with GUETOR. Since we can extend GUETOR/OUTPUT to our system, we can freely define output with our custom configuration.
+
+![Animation](compare-md.gif)
+
 Author
 ------
 
