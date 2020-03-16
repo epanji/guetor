@@ -2,7 +2,7 @@
 
 #-asdf3.1 (error "GUETOR requires ASDF 3.1 or later.")
 (defsystem "guetor"
-  :version "0.1.0"
+  :version "0.1.1"
   :author "Panji Kusuma <epanji@gmail.com>"
   :description "GUETOR stands for guess selector."
   :license  "zlib"
