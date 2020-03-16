@@ -85,17 +85,24 @@ Get title with two values as results. First is the title and second is predicate
 Get url string for forward or backward navigation.
 
 ``` common-lisp
+(let ((guetor:*navigation-base* "http://sample.com"))
+  (guetor:find-navigation (guetor:document #p"test.html")))
+=> "http://sample.com/next"
+
 (let ((guetor:*navigation-base* "http://sample.com")
       (guetor:*navigation-direction* :forward))
   (guetor:find-navigation (guetor:document #p"test.html")))
 => "http://sample.com/next"
+
 (let ((guetor:*navigation-base* "http://sample.com"))
   (guetor:find-navigation (guetor:document #p"test.html") :forward))
 => "http://sample.com/next"
+
 (let ((guetor:*navigation-base* "http://sample.com")
       (guetor:*navigation-direction* :backward))
   (guetor:find-navigation (guetor:document #p"test.html")))
 => "http://sample.com/prev"
+
 (let ((guetor:*navigation-base* "http://sample.com"))
   (guetor:find-navigation (guetor:document #p"test.html") :backward))
 => "http://sample.com/prev"
