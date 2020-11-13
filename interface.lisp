@@ -32,6 +32,8 @@
    #:find-navigation
    #:navigation-not-found
    #:navigation-base-unset
+   ;; guetor/output
+   #:*skipped-texts*
    ;; guetor/content-markless
    #:output-markless
    ;; guetor/content-markdown
