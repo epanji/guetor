@@ -27,9 +27,10 @@
            #:*record-number*
            #:*record-string*
            ;; ---------------------
-           #:define-output))
+           #:define-output)
+  (:export #:*skipped-element-tag*
+           #:*skipped-texts*))
 (in-package :guetor/output)
-
 
 ;;; Tag open and close rules:
 ;;; - Forbid space or end of line on first character opening tag.
@@ -100,7 +101,6 @@
 
 (defun attribute-format (name)
   (indicator-value *plist-attribute* (concatenate-keyword name) nil))
-
 
 ;;; Counter
 ;;;
@@ -143,7 +143,6 @@
     (when (plusp length)
       (setf *record-string* (tail-string no-digit))))
   string)
-
 
 ;;; Prefixer
 ;;;
@@ -177,7 +176,6 @@
     (if (plusp (length string))
         (cons (plump:tag-name node) *record-parents*)
         *record-parents*)))
-
 
 ;;; Finalizer
 ;;;
@@ -224,7 +222,6 @@
       (unless (find (aref string 0) "?!.,:;")
         (princ +space-string+ stream))))
   (princ string stream))
-
 
 ;;; Repeater
 ;;;
@@ -242,7 +239,6 @@
                        (when (eql indicator :open) "~&")
                        (subseq tag-value 2))))
         (format stream control) t))))
-
 
 ;;; Delimiter
 ;;;
@@ -269,7 +265,19 @@
         (format stream control
                 side (make-list size :initial-element middle) side)
         t))))
+
+;;; Skipper
+;;;
+(defvar *skipped-texts* nil)
+(defvar *skipped-element-tag* "a")
 
+(defun skipped-text-p (node)
+  (and (not (null *skipped-texts*))
+       (listp *skipped-texts*)
+       (string= *skipped-element-tag* (plump:tag-name node))
+       (loop for text in *skipped-texts*
+             when (string-equal text (plump:render-text node))
+               return t)))
 
 ;;;
 ;;; Reference from plump:serialize-object
@@ -303,25 +311,26 @@
 (defmethod element-lossy-output ((node plump:doctype)))
 (defmethod element-lossy-output ((node plump:comment)))
 (defmethod element-lossy-output ((node plump:element))
-  (unless (or (repeater node :open *stream*)
-              (delimiter node :open *stream*))
-    (final-tag-value (plump:tag-name node) :open *stream*))
-  (when (and (not (plist-tag-value (plump:tag-name node)
-                                   :swap-attributes-p nil))
-             (plist-tag (plump:tag-name node)))
-    (element-lossy-output (plump:attributes node)))
-  (unless (skip-children-p node)
-    (loop with *record-parents* = (update-prefixer node)
-          and *record-number* = (update-counter node)
-          and *raw-children-text-p* = (raw-children-text-p node)
-          for child across (plump:children node)
-          do (element-lossy-output child)))
-  (unless (or (repeater node :close *stream*)
-              (delimiter node :close *stream*))
-    (final-tag-value (plump:tag-name node) :close *stream*))
-  (when (and (plist-tag-value (plump:tag-name node) :swap-attributes-p nil)
-             (plist-tag (plump:tag-name node)))
-    (element-lossy-output (plump:attributes node))))
+  (unless (skipped-text-p node)
+    (unless (or (repeater node :open *stream*)
+                (delimiter node :open *stream*))
+      (final-tag-value (plump:tag-name node) :open *stream*))
+    (when (and (not (plist-tag-value (plump:tag-name node)
+                                     :swap-attributes-p nil))
+               (plist-tag (plump:tag-name node)))
+      (element-lossy-output (plump:attributes node)))
+    (unless (skip-children-p node)
+      (loop with *record-parents* = (update-prefixer node)
+            and *record-number* = (update-counter node)
+            and *raw-children-text-p* = (raw-children-text-p node)
+            for child across (plump:children node)
+            do (element-lossy-output child)))
+    (unless (or (repeater node :close *stream*)
+                (delimiter node :close *stream*))
+      (final-tag-value (plump:tag-name node) :close *stream*))
+    (when (and (plist-tag-value (plump:tag-name node) :swap-attributes-p nil)
+               (plist-tag (plump:tag-name node)))
+      (element-lossy-output (plump:attributes node)))))
 (defmethod element-lossy-output ((node plump:fulltext-element)))
 (defmethod element-lossy-output ((node plump:xml-header)))
 (defmethod element-lossy-output ((node plump:cdata)))
