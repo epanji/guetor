@@ -82,8 +82,9 @@ Set to NIL will make navigation choose last index by default.")
                 :message (format nil "Variable *navigation-base* is ~
                                  not set. Use prepare-navigation-text ~
                                  to set it up.~%")))
-        (t
-         (concatenate 'string *navigation-base* string))))
+        (t ; Ensure having single slash separator
+         (concatenate 'string (string-trim "/" *navigation-base*) "/"
+                      (string-trim "/" string)))))
 
 (defun find-navigation-node (working-nodes)
   (lquery:$ working-nodes *navigation-selector*
