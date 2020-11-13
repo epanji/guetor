@@ -94,8 +94,8 @@
   (let ((root (or (document document) *document*)))
     (cond ((null root) *default-selector*)
           ((or (%perform-guess-p) force-p)
-           (progn (unless (eql *document* root) (setf *document* root))
-                  (setf *selector* (or (%selector root) *default-selector*))))
+           (unless (eql *document* root) (setf *document* root))
+           (setf *selector* (or (%selector root) *default-selector*)))
           (t *selector*))))
 
 (defun contents-wrapper (document &optional force-p)
