@@ -72,9 +72,9 @@ Running test suite CONTENT-MARKLESS
  Running test OUTPUT-MARKLESS-FOR-CODE ..
  Running test OUTPUT-MARKLESS-FOR-PRE .
  Running test OUTPUT-MARKLESS-FOR-BR .
- Running test OUTPUT-MARKLESS-FOR-A .
- Did 32 checks.
-    Pass: 32 (100%)
+ Running test OUTPUT-MARKLESS-FOR-A ...
+ Did 34 checks.
+    Pass: 34 (100%)
     Skip: 0 ( 0%)
     Fail: 0 ( 0%)
 
@@ -101,10 +101,10 @@ Running test suite CONTENT-MARKDOWN
  Running test OUTPUT-MARKDOWN-FOR-CODE ..
  Running test OUTPUT-MARKDOWN-FOR-PRE .
  Running test OUTPUT-MARKDOWN-FOR-BR .
- Running test OUTPUT-MARKDOWN-FOR-A .
+ Running test OUTPUT-MARKDOWN-FOR-A ...
  Running test OUTPUT-MARKDOWN-FOR-TABLE .
- Did 33 checks.
-    Pass: 33 (100%)
+ Did 35 checks.
+    Pass: 35 (100%)
     Skip: 0 ( 0%)
     Fail: 0 ( 0%)
 
