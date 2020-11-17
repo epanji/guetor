@@ -72,7 +72,9 @@
                   </tbody>
                 </table>")
     ("br" . "<p>one<br>two three</p>")
-    ("a" . "<p>the <a href=\"#id\">link</a> text</p")))
+    ("a" . "<p>the <a href=\"#id\">link</a> text</p>")
+    ("a-skip" . "<p>the <a href=\"#id\">skipped</a> text</p>")
+    ("a-skip-!" . "<p>the <a href=\"#id\">skipped</a>! text</p>")))
 
 (defun sample-from-html (sample-name)
   (declare (string sample-name))
@@ -408,9 +410,14 @@
                  (format nil "one two three~2&")))))
 
 (test output-markless-for-a
-  (let ((fun (function output-markless)))
+  (let ((fun (function output-markless))
+        (*skipped-texts* '("skipped")))
     (is (string= (output-from-sample "a" fun)
-                 (format nil "the \"link\"(#id) text~2&")))))
+                 (format nil "the \"link\"(#id) text~2&")))
+    (is (string= (output-from-sample "a-skip" fun)
+                 (format nil "the text~2&")))
+    (is (string= (output-from-sample "a-skip-!" fun)
+                 (format nil "the! text~2&")))))
 
 (in-suite :content-markdown)
 
@@ -545,9 +552,14 @@
                  (format nil "one two three~2&")))))
 
 (test output-markdown-for-a
-  (let ((fun (function output-markdown)))
+  (let ((fun (function output-markdown))
+        (*skipped-texts* '("skipped")))
     (is (string= (output-from-sample "a" fun)
-                 (format nil "the [link](#id) text~2&")))))
+                 (format nil "the [link](#id) text~2&")))
+    (is (string= (output-from-sample "a-skip" fun)
+                 (format nil "the text~2&")))
+    (is (string= (output-from-sample "a-skip-!" fun)
+                 (format nil "the! text~2&")))))
 
 (test output-markdown-for-table
   (let ((fun (function output-markdown)))
